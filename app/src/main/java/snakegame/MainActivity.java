@@ -1,15 +1,14 @@
 package snakegame;
 
 import android.graphics.Point;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
 
 import snakegame.ui.GameStage;
 
 public class MainActivity extends AppCompatActivity {
-
-    private GameStage _gameStage;
+    private GameStage gameStage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,10 +22,10 @@ public class MainActivity extends AppCompatActivity {
         display.getSize(size);
 
         // Create a game stage
-        _gameStage = new GameStage(this, size);
+        gameStage = new GameStage(this, size);
 
         // Set game stage as view
-        setContentView(_gameStage);
+        setContentView(gameStage);
     }
 
     @Override
@@ -34,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         // Start game stage thread
-        _gameStage.resume();
+        gameStage.resume();
     }
 
     @Override
@@ -42,6 +41,6 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
 
         // Stop game stage thread
-        _gameStage.pause();
+        gameStage.pause();
     }
 }
