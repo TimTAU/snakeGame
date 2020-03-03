@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -48,13 +49,13 @@ public class GameStage extends SurfaceView implements Runnable {
     private final String congratulationsMsg;
 
     //Colors
-    private final int backgroundColor;
     private final int textColor;
     private final int snakeColor;
     private final int foodColor;
     private final int controllersColor;
 
-    //Draw
+    //Bitmaps
+    private final Bitmap backgroundBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.background_image);
     private final Bitmap foodBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.apple_icon);
     private final Bitmap snakeHeadBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.snake_head);
     private final Bitmap snakeBodyBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.snake_body);
@@ -69,7 +70,6 @@ public class GameStage extends SurfaceView implements Runnable {
         congratulationsMsg = getContext().getString(R.string.congratulations);
 
         //Set colors
-        backgroundColor = getContext().getResources().getColor(R.color.background);
         textColor = getContext().getResources().getColor(R.color.text);
         snakeColor = getContext().getResources().getColor(R.color.snake);
         foodColor = getContext().getResources().getColor(R.color.food);
@@ -250,8 +250,8 @@ public class GameStage extends SurfaceView implements Runnable {
     private void draw() {
         if (surfaceHolder.getSurface().isValid()) {
             Canvas canvas = surfaceHolder.lockCanvas();
-            // Set background color
-            canvas.drawColor(backgroundColor);
+            // Set background image
+            canvas.drawBitmap(backgroundBitmap, null, new RectF(0, 0, screenX, screenY), null);
 
             if (isPlaying) {
                 drawGame(canvas, paint);

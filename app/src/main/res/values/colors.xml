@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="background">#00FF00</color>
     <color name="controllers">#88303F9F</color>
     <color name="food">#FF4081</color>
     <color name="snake">@android:color/black</color>
