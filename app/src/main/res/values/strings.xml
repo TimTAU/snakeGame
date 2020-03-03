@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SnakeGame</string>
+    <string name="app_name" translatable="false">SnakeGame</string>
     <string name="current_score">Score: %s</string>
     <string name="last_score">Last score: %s</string>
     <string name="start_game_prompt">Touch the screen to start game</string>
