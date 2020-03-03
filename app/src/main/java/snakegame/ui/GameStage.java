@@ -54,6 +54,11 @@ public class GameStage extends SurfaceView implements Runnable {
     private final int foodColor;
     private final int controllersColor;
 
+    //Draw
+    private final Bitmap foodBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.apple_icon);
+    private final Bitmap snakeHeadBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.snake_head);
+    private final Bitmap snakeBodyBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.snake_body);
+
     public GameStage(Context context, Point size) {
         super(context);
 
@@ -274,20 +279,23 @@ public class GameStage extends SurfaceView implements Runnable {
 
         // Draw food
         paint.setColor(foodColor);
-        Rect mRedPaddleRect = new Rect(food.left, food.top, food.right, food.bottom);
-        Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.apple_icon);
-        canvas.drawBitmap(bitmap, null, mRedPaddleRect, paint);
+        Rect foodRect = new Rect(food.left, food.top, food.right, food.bottom);
+        canvas.drawBitmap(foodBitmap, null, foodRect, paint);
 
         // Set snake color
         paint.setColor(snakeColor);
 
         // Draw the snake
         for (int i = 0; i < snake.getSnakeLength() + 1; i++) {
-            canvas.drawRect(snake.bodyXs[i] * snakeBlockSize,
+            Rect snakeRect = new Rect(snake.bodyXs[i] * snakeBlockSize,
                     (snake.bodyYs[i] * snakeBlockSize),
                     (snake.bodyXs[i] * snakeBlockSize) + snakeBlockSize,
-                    (snake.bodyYs[i] * snakeBlockSize) + snakeBlockSize,
-                    paint);
+                    (snake.bodyYs[i] * snakeBlockSize) + snakeBlockSize);
+            if (i == 0) {
+                canvas.drawBitmap(snakeHeadBitmap, null, snakeRect, paint);
+            } else {
+                canvas.drawBitmap(snakeBodyBitmap, null, snakeRect, paint);
+            }
         }
 
         // Scale the HUD text
