@@ -18,19 +18,16 @@ import snakegame.model.Controls;
 import snakegame.model.Snake;
 
 public class GameStage extends SurfaceView implements Runnable {
-    private final long MILLIS_PER_SECOND = 1000;
-    private final int NUM_BLOCKS_WIDE = 40;
+    private int numBlocksWide = 40;
     private long fps = 7;
     private final SurfaceHolder surfaceHolder;
     private final Paint paint;
     private Thread thread = null;
-    private Canvas canvas;
     private volatile boolean isRunning;
     private volatile boolean isPlaying;
     private int screenX;
     private int screenY;
     private int snakeBlockSize;
-    private int controlButtonSize;
     private int numBlocksHigh;
     private long nextFrameTime;
     private int maxBlocksOnScreen;
@@ -76,11 +73,15 @@ public class GameStage extends SurfaceView implements Runnable {
         surfaceHolder = getHolder();
         paint = new Paint();
 
-        snakeBlockSize = screenX / NUM_BLOCKS_WIDE;
+        //Resize when using portrait mode
+        if (screenX < screenY) {
+            numBlocksWide = 20;
+        }
+        snakeBlockSize = screenX / numBlocksWide;
         numBlocksHigh = screenY / snakeBlockSize;
-        maxBlocksOnScreen = NUM_BLOCKS_WIDE * numBlocksHigh;
-        controlButtonSize = snakeBlockSize * 3;
+        maxBlocksOnScreen = numBlocksWide * numBlocksHigh;
 
+        int controlButtonSize = snakeBlockSize * 3;
         int controlsY = screenY - (controlButtonSize * 3) - snakeBlockSize;
         controls = new Controls(snakeBlockSize, controlsY, controlButtonSize);
 
@@ -128,7 +129,7 @@ public class GameStage extends SurfaceView implements Runnable {
      */
     private void startGame() {
         snake = new Snake(
-                NUM_BLOCKS_WIDE / 2,
+                numBlocksWide / 2,
                 numBlocksHigh / 2,
                 Snake.Direction.RIGHT,
                 maxBlocksOnScreen);
@@ -152,7 +153,7 @@ public class GameStage extends SurfaceView implements Runnable {
         List ys = Collections.singletonList(snake.bodyYs);
 
         do {
-            rx = random.nextInt(NUM_BLOCKS_WIDE - 1) + 1;
+            rx = random.nextInt(numBlocksWide - 1) + 1;
             ry = random.nextInt(numBlocksHigh - 1) + 1;
         } while (xs.contains(rx) && ys.contains(ry));
 
@@ -172,6 +173,7 @@ public class GameStage extends SurfaceView implements Runnable {
      */
     public boolean updateRequired() {
         if (nextFrameTime <= System.currentTimeMillis()) {
+            long MILLIS_PER_SECOND = 1000;
             nextFrameTime = System.currentTimeMillis() + MILLIS_PER_SECOND / fps;
             return true;
         }
@@ -190,7 +192,6 @@ public class GameStage extends SurfaceView implements Runnable {
 
         if (detectDeath()) {
             isPlaying = false;
-            fps = 7;
         }
     }
 
@@ -217,7 +218,7 @@ public class GameStage extends SurfaceView implements Runnable {
      */
     private boolean detectDeath() {
         // Hit the screen edge
-        if (snake.getHeadX() == -1 || snake.getHeadX() >= NUM_BLOCKS_WIDE + 1 || snake.getHeadY() == -1 || snake.getHeadY() == numBlocksHigh + 1) {
+        if (snake.getHeadX() == -1 || snake.getHeadX() >= numBlocksWide + 1 || snake.getHeadY() == -1 || snake.getHeadY() == numBlocksHigh + 1) {
             return true;
         }
 
@@ -239,7 +240,7 @@ public class GameStage extends SurfaceView implements Runnable {
      */
     private void draw() {
         if (surfaceHolder.getSurface().isValid()) {
-            canvas = surfaceHolder.lockCanvas();
+            Canvas canvas = surfaceHolder.lockCanvas();
             // Set background color
             canvas.drawColor(backgroundColor);
 
