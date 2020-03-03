@@ -1,5 +1,6 @@
 package snakegame.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -17,6 +18,7 @@ import br.com.mxel.snakegame.R;
 import snakegame.model.Controls;
 import snakegame.model.Snake;
 
+@SuppressLint("ViewConstructor")
 public class GameStage extends SurfaceView implements Runnable {
     private int numBlocksWide = 40;
     private long fps = 7;
@@ -294,6 +296,7 @@ public class GameStage extends SurfaceView implements Runnable {
         canvas.drawText(String.format(currentScoreMsg, score), 10, 60, paint);
     }
 
+    @SuppressWarnings("IntegerDivisionInFloatingPointContext")
     private void drawStart(Canvas canvas, Paint paint) {
         // Set text color
         paint.setColor(textColor);
@@ -331,6 +334,7 @@ public class GameStage extends SurfaceView implements Runnable {
         canvas.drawText(startPromptMsg, halfScreen - halfText, screenY / 2, paint);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
@@ -351,7 +355,6 @@ public class GameStage extends SurfaceView implements Runnable {
                 startGame();
             }
         }
-
         return super.onTouchEvent(motionEvent);
     }
 }
