@@ -2,6 +2,8 @@ package snakegame.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -270,14 +272,11 @@ public class GameStage extends SurfaceView implements Runnable {
                     paint);
         }
 
-        // Set food color
+        // Draw food
         paint.setColor(foodColor);
-        canvas.drawRect(
-                food.left,
-                food.top,
-                food.right,
-                food.bottom,
-                paint);
+        Rect mRedPaddleRect = new Rect(food.left, food.top, food.right, food.bottom);
+        Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.apple_icon);
+        canvas.drawBitmap(bitmap, null, mRedPaddleRect, paint);
 
         // Set snake color
         paint.setColor(snakeColor);
