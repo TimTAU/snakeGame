@@ -21,7 +21,7 @@ public class GameStage extends SurfaceView implements Runnable {
 
     private final long MILLIS_PER_SECOND = 1000;
     private final int NUM_BLOCKS_WIDE = 40;
-    private long FPS = 10;
+    private long FPS = 7;
     private final SurfaceHolder _surfaceHolder;
     private final Paint _paint;
     private Thread _thread = null;
@@ -176,7 +176,7 @@ public class GameStage extends SurfaceView implements Runnable {
         if (_score < (_maxBlocksOnScreen - 1)) {
             spawnFood();
             _snake.increaseSize();
-            if (_score % 2 == 0) {
+            if (_score % 4 == 0 && FPS <= 20) {
                 FPS++;
             }
         } else {
