@@ -10,7 +10,7 @@ public class Controls {
         LEFT
     }
 
-    private Rect[] buttons;
+    private final Rect[] buttons;
 
     public Controls(int posX, int posY, int buttonSize) {
         buttons = new Rect[4];

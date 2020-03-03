@@ -9,8 +9,8 @@ public class Snake {
         LEFT
     }
 
-    public int[] bodyXs;
-    public int[] bodyYs;
+    public final int[] bodyXs;
+    public final int[] bodyYs;
     private int snakeLength;
 
     private Direction currentDirection;

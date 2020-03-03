@@ -24,6 +24,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Android
+    //newer version breaks building
+    //noinspection GradleDependency
     implementation "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
 
     // Tests

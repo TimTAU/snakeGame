@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import br.com.mxel.snakegame.R;
+import snakegame.R;
 import snakegame.model.Controls;
 import snakegame.model.Snake;
 
@@ -27,30 +27,30 @@ public class GameStage extends SurfaceView implements Runnable {
     private Thread thread = null;
     private volatile boolean isRunning;
     private volatile boolean isPlaying;
-    private int screenX;
-    private int screenY;
-    private int snakeBlockSize;
-    private int numBlocksHigh;
+    private final int screenX;
+    private final int screenY;
+    private final int snakeBlockSize;
+    private final int numBlocksHigh;
     private long nextFrameTime;
-    private int maxBlocksOnScreen;
+    private final int maxBlocksOnScreen;
 
     private Snake snake;
-    private Controls controls;
-    private Rect food;
+    private final Controls controls;
+    private final Rect food;
     private int score;
 
     //Messages
-    private String currentScoreMsg;
-    private String lastScoreMsg;
-    private String startPromptMsg;
-    private String congratulationsMsg;
+    private final String currentScoreMsg;
+    private final String lastScoreMsg;
+    private final String startPromptMsg;
+    private final String congratulationsMsg;
 
     //Colors
-    private int backgroundColor;
-    private int textColor;
-    private int snakeColor;
-    private int foodColor;
-    private int controllersColor;
+    private final int backgroundColor;
+    private final int textColor;
+    private final int snakeColor;
+    private final int foodColor;
+    private final int controllersColor;
 
     public GameStage(Context context, Point size) {
         super(context);
@@ -173,7 +173,7 @@ public class GameStage extends SurfaceView implements Runnable {
      *
      * @return true if update is required
      */
-    public boolean updateRequired() {
+    private boolean updateRequired() {
         if (nextFrameTime <= System.currentTimeMillis()) {
             long MILLIS_PER_SECOND = 1000;
             nextFrameTime = System.currentTimeMillis() + MILLIS_PER_SECOND / fps;
@@ -185,7 +185,7 @@ public class GameStage extends SurfaceView implements Runnable {
     /**
      * Updates the game state
      */
-    public void update() {
+    private void update() {
         if ((snake.getHeadX() * snakeBlockSize) == food.left && (snake.getHeadY() * snakeBlockSize) == food.top) {
             eatFood();
         }
