@@ -168,6 +168,7 @@ public class GameStage extends SurfaceView implements Runnable {
 
         if (detectDeath()) {
             _isPlaying = false;
+            FPS = 7;
         }
     }
 
