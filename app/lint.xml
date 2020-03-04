@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="IconLocation">
+        <ignore path="src/main/res/drawable/background_grass.png" />
+        <ignore path="src/main/res/drawable/background_water.jpg" />
+        <ignore path="src/main/res/drawable/background_water_new.jpg" />
+        <ignore path="src/main/res/drawable/food_apple.png" />
+        <ignore path="src/main/res/drawable/food_fish.png" />
+        <ignore path="src/main/res/drawable/snake_body.png" />
+        <ignore path="src/main/res/drawable/snake_head.png" />
+        <ignore path="src/main/res/drawable/snake_water_body.png" />
+        <ignore path="src/main/res/drawable/snake_water_head.png" />
+    </issue>
+</lint>

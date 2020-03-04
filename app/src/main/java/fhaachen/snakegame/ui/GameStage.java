@@ -2,6 +2,7 @@ package fhaachen.snakegame.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,15 +23,14 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.Objects;
+import java.util.Random;
+import java.util.stream.IntStream;
+
 import fhaachen.snakegame.R;
-import fhaachen.snakegame.model.ControlMode;
 import fhaachen.snakegame.model.Controls;
 import fhaachen.snakegame.model.Snake;
 import fhaachen.snakegame.model.Theme;
@@ -38,31 +38,32 @@ import fhaachen.snakegame.model.Theme;
 import static androidx.core.content.ContextCompat.getSystemService;
 
 @SuppressLint("ViewConstructor")
-public class GameStage extends SurfaceView implements Runnable {
-    private Context context;
+public class GameStage extends SurfaceView implements Runnable, DialogInterface.OnDismissListener {
     private int numBlocksWide = 40;
     private long fps = 7;
-    private SurfaceHolder surfaceHolder;
-    private Paint paint;
+    private final SurfaceHolder surfaceHolder;
+    private final Paint paint;
     private Thread thread = null;
     private volatile boolean isRunning;
     private volatile boolean isPlaying;
-    private int screenX;
-    private int screenY;
-    private int snakeBlockSize;
-    private int numBlocksHigh;
+    private boolean pauseMenuShown;
+    private final int screenX;
+    private final int screenY;
+    private final int snakeBlockSize;
+    private final int numBlocksHigh;
     private long nextFrameTime;
-    private int maxBlocksOnScreen;
-    private Display display;
-    private final ControlMode controlMode = ControlMode.TILT;
+    private final int maxBlocksOnScreen;
+    private final Display display;
+    private final Controls.Mode controlMode = Controls.Mode.BUTTONS;
 
     private Snake snake;
-    private Controls controls;
-    private Rect food;
+    private final Controls controls;
+    private final Rect food;
     private int score;
 
-    //Message
-    private String currentScoreMsg;
+    //Resource strings
+    private final String menuTitle;
+    private final String currentScoreMsg;
 
     //Colors
     private int scoreTextColor;
@@ -76,16 +77,14 @@ public class GameStage extends SurfaceView implements Runnable {
     private Bitmap snakeHeadBitmap;
     private Bitmap snakeBodyBitmap;
 
-    private boolean died = false;
-
     public GameStage(Context context, Point size) {
         super(context);
-        this.context = context;
         //Context variables for later use
-        final Resources contextResources = getContext().getResources();
-        final Resources.Theme contextTheme = getContext().getTheme();
+        Resources contextResources = getContext().getResources();
+        Resources.Theme contextTheme = getContext().getTheme();
 
-        //Set message
+        //Set resource strings
+        menuTitle = getContext().getString(R.string.app_name);
         currentScoreMsg = getContext().getString(R.string.current_score);
 
         //Set colors
@@ -135,7 +134,7 @@ public class GameStage extends SurfaceView implements Runnable {
 
         //Prepares the button draw if needed
         //noinspection ConstantConditions TODO: Delete noinspect after setting implementation
-        if (controlMode == ControlMode.BUTTONS) {
+        if (controlMode == Controls.Mode.BUTTONS) {
             int controlButtonSize = snakeBlockSize * 3;
             int controlsY = screenY - (controlButtonSize * 3) - snakeBlockSize;
             controls = new Controls(snakeBlockSize, controlsY, controlButtonSize);
@@ -176,28 +175,59 @@ public class GameStage extends SurfaceView implements Runnable {
      * Resumes the game after counter hits zero
      */
     public void resume() {
-        if (!isRunning) {
-            isRunning = true;
-            thread = new Thread(this);
-            thread.start();
-        }
+        isRunning = true;
+        thread = new Thread(this);
+        thread.start();
+    }
+
+    @SuppressLint("InflateParams")
+    // Pass null as the parent view because its going in the dialog layout
+    public void showPauseDialog(AppCompatActivity currentActivity) {
+        pauseMenuShown = true;
+        AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
+
+        // Inflate and set the layout for the dialog
+        builder.setView(currentActivity.getLayoutInflater().inflate(R.layout.pause_menu, null))
+                .setTitle(menuTitle)
+                .setPositiveButton(R.string.play, (dialog, id) -> startGameAndClosePauseMenu())
+                .setNegativeButton(R.string.exit, (dialog, id) -> currentActivity.finishAndRemoveTask())
+                .setOnDismissListener(this);
+
+        runOnUiThread(() -> builder.create().show());
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        startGameAndClosePauseMenu();
+    }
+
+    private static void runOnUiThread(Runnable runnable) {
+        Handler UIHandler = new Handler(Looper.getMainLooper());
+        UIHandler.post(runnable);
+    }
+
+    private void startGameAndClosePauseMenu() {
+        startGame();
+        pauseMenuShown = false;
+        isRunning = true;
     }
 
     /**
      * Sets all variables needed for game start
      */
     private void startGame() {
-        snake = new Snake(
-                numBlocksWide / 2,
-                numBlocksHigh / 2,
-                Snake.Direction.RIGHT,
-                maxBlocksOnScreen);
+        if (!isPlaying) {
+            snake = new Snake(
+                    numBlocksWide / 2,
+                    numBlocksHigh / 2,
+                    maxBlocksOnScreen);
 
-        spawnFood();
-        score = 0;
-        nextFrameTime = System.currentTimeMillis();
-        isPlaying = true;
-        fps = 7;
+            spawnFood();
+            score = 0;
+            nextFrameTime = System.currentTimeMillis();
+            isPlaying = true;
+            fps = 7;
+        }
     }
 
     /**
@@ -205,19 +235,16 @@ public class GameStage extends SurfaceView implements Runnable {
      */
     private void spawnFood() {
         Random random = new Random();
-        int rx;
-        int ry;
-
-        List xs = Collections.singletonList(snake.bodyXs);
-        List ys = Collections.singletonList(snake.bodyYs);
+        int randomX;
+        int randomY;
 
         do {
-            rx = random.nextInt(numBlocksWide - 1) + 1;
-            ry = random.nextInt(numBlocksHigh - 1) + 1;
-        } while (xs.contains(rx) && ys.contains(ry));
+            randomX = random.nextInt(numBlocksWide - 1) + 1;
+            randomY = random.nextInt(numBlocksHigh - 1) + 1;
+        } while (positionInsideSnake(randomX, randomY));
 
-        int x = rx * snakeBlockSize;
-        int y = ry * snakeBlockSize;
+        int x = randomX * snakeBlockSize;
+        int y = randomY * snakeBlockSize;
         food.set(
                 x,
                 y,
@@ -226,14 +253,40 @@ public class GameStage extends SurfaceView implements Runnable {
     }
 
     /**
+     * Checks if the given coordinates are included in the snake
+     *
+     * @param x coordinate to be checked
+     * @param y coordinate to be checked
+     * @return true if the coordinate is included
+     */
+    private boolean positionInsideSnake(int x, int y) {
+        return IntStream.of(snake.getBodyXs()).anyMatch(snakeX -> snakeX == x) && IntStream.of(snake.getBodyYs()).anyMatch(snakeY -> snakeY == y);
+    }
+
+    /**
+     * Consumes food and spawns new
+     */
+    private void eatFood() {
+        score++;
+        if (score < (maxBlocksOnScreen - 1)) {
+            spawnFood();
+            snake.increaseSize();
+            if (score != 0 && score % 4 == 0 && fps <= 20) {
+                fps++;
+            }
+        } else {
+            isPlaying = false;
+        }
+    }
+
+    /**
      * Evaluates if a screen update is required
      *
      * @return true if update is required
      */
     private boolean updateRequired() {
-        if (nextFrameTime <= System.currentTimeMillis()) {
-            long MILLIS_PER_SECOND = 1000;
-            nextFrameTime = System.currentTimeMillis() + MILLIS_PER_SECOND / fps;
+        if (!pauseMenuShown && nextFrameTime <= System.currentTimeMillis()) {
+            nextFrameTime = System.currentTimeMillis() + 1000 / fps;
             return true;
         }
         return false;
@@ -251,24 +304,7 @@ public class GameStage extends SurfaceView implements Runnable {
 
         if (detectDeath()) {
             isPlaying = false;
-            died = true;
             snake = null;
-        }
-    }
-
-    /**
-     * Consumes food and spawns new
-     */
-    private void eatFood() {
-        score++;
-        if (score < (maxBlocksOnScreen - 1)) {
-            spawnFood();
-            snake.increaseSize();
-            if (score % 4 == 0 && fps <= 20) {
-                fps++;
-            }
-        } else {
-            isPlaying = false;
         }
     }
 
@@ -286,8 +322,8 @@ public class GameStage extends SurfaceView implements Runnable {
         // Hit itself
         for (int i = snake.getSnakeLength(); i > 0; i--) {
             if ((i > 4)
-                    && (snake.getHeadX() == snake.bodyXs[i])
-                    && (snake.getHeadY() == snake.bodyYs[i])) {
+                    && (snake.getHeadX() == snake.getBodyX(i))
+                    && (snake.getHeadY() == snake.getBodyY(i))) {
                 return true;
             }
         }
@@ -295,7 +331,6 @@ public class GameStage extends SurfaceView implements Runnable {
         // Hit nothing
         return false;
     }
-
 
     /**
      * Draws the game field
@@ -306,7 +341,7 @@ public class GameStage extends SurfaceView implements Runnable {
             // Set background image
             canvas.drawBitmap(backgroundBitmap, null, new RectF(0, 0, screenX, screenY), null);
 
-            if (isPlaying) {
+            if (isPlaying && !pauseMenuShown) {
                 drawGame(canvas, paint);
             } else {
                 drawStart();
@@ -316,12 +351,29 @@ public class GameStage extends SurfaceView implements Runnable {
         }
     }
 
+    private void drawStart() {
+        if (!isPlaying && !pauseMenuShown) {
+            if (score != 0) {
+                TextView lastScoreLabel = findViewById(R.id.your_score_label);
+                if (lastScoreLabel != null) {
+                    lastScoreLabel.setVisibility(VISIBLE);
+                }
+                TextView lastScore = findViewById(R.id.your_score);
+                if (lastScore != null) {
+                    lastScore.setVisibility(VISIBLE);
+                    lastScore.setText(score);
+                }
+            }
+            showPauseDialog((AppCompatActivity) getContext());
+        }
+    }
+
     private void drawGame(Canvas canvas, Paint paint) {
         // Set controls color
         paint.setColor(controllersColor);
 
         // Draw controls if needed
-        if (controlMode == ControlMode.BUTTONS && controls != null) {
+        if (controlMode == Controls.Mode.BUTTONS && controls != null) {
             for (Rect control : controls.getButtons()) {
                 canvas.drawRect(
                         control.left,
@@ -342,10 +394,10 @@ public class GameStage extends SurfaceView implements Runnable {
 
         // Draw the snake
         for (int i = 0; i < snake.getSnakeLength() + 1; i++) {
-            Rect snakeRect = new Rect(snake.bodyXs[i] * snakeBlockSize,
-                    (snake.bodyYs[i] * snakeBlockSize),
-                    (snake.bodyXs[i] * snakeBlockSize) + snakeBlockSize,
-                    (snake.bodyYs[i] * snakeBlockSize) + snakeBlockSize);
+            Rect snakeRect = new Rect(snake.getBodyX(i) * snakeBlockSize,
+                    (snake.getBodyY(i) * snakeBlockSize),
+                    (snake.getBodyX(i) * snakeBlockSize) + snakeBlockSize,
+                    (snake.getBodyY(i) * snakeBlockSize) + snakeBlockSize);
             if (i == 0) {
                 canvas.drawBitmap(snakeHeadBitmap, null, snakeRect, paint);
             } else {
@@ -359,53 +411,6 @@ public class GameStage extends SurfaceView implements Runnable {
         canvas.drawText(String.format(currentScoreMsg, score), 10, 60, paint);
     }
 
-
-    private void drawStart() {
-
-        if (died) {
-
-            TextView tvl = findViewById(R.id.your_score_label);
-            if (tvl != null) tvl.setVisibility(VISIBLE);
-            TextView tv = findViewById(R.id.your_score);
-            if (tv != null) {
-                tv.setVisibility(VISIBLE);
-                tv.setText(score);
-            }
-            showPauseDialog((AppCompatActivity) context);
-            died = false;
-        }
-
-    }
-
-    @SuppressLint("InflateParams")
-    // Pass null as the parent view because its going in the dialog layout
-    public void showPauseDialog(final AppCompatActivity currentActivity) {
-        if (isPlaying) {
-            pause();
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
-
-        // Inflate and set the layout for the dialog
-        builder.setView(currentActivity.getLayoutInflater().inflate(R.layout.pause_menu, null))
-                .setPositiveButton(R.string.play, (dialog, id) -> {
-                    if (snake == null) {
-                        startGame();
-                    }
-                    resume();
-                })
-                .setNegativeButton(R.string.exit, (dialog, id) -> currentActivity.finishAndRemoveTask());
-
-        runOnUiThread(() -> {
-            builder.create().show();
-        });
-    }
-
-    public static void runOnUiThread(Runnable runnable) {
-        final Handler UIHandler = new Handler(Looper.getMainLooper());
-        UIHandler.post(runnable);
-    }
-
     /**
      * Method for button control
      *
@@ -416,18 +421,18 @@ public class GameStage extends SurfaceView implements Runnable {
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-            if (controlMode == ControlMode.BUTTONS && isPlaying) {
+            if (controlMode == Controls.Mode.BUTTONS && isPlaying) {
                 int posX = Math.round(motionEvent.getX());
                 int posY = Math.round(motionEvent.getY());
 
                 if (controls.getButton(Controls.Button.LEFT).contains(posX, posY)) {
-                    snake.setCurrentDirection(Snake.Direction.LEFT);
+                    snake.setDirectionLeft();
                 } else if (controls.getButton(Controls.Button.UP).contains(posX, posY)) {
-                    snake.setCurrentDirection(Snake.Direction.UP);
+                    snake.setDirectionUp();
                 } else if (controls.getButton(Controls.Button.RIGHT).contains(posX, posY)) {
-                    snake.setCurrentDirection(Snake.Direction.RIGHT);
+                    snake.setDirectionRight();
                 } else if (controls.getButton(Controls.Button.DOWN).contains(posX, posY)) {
-                    snake.setCurrentDirection(Snake.Direction.DOWN);
+                    snake.setDirectionDown();
                 }
             } else {
                 startGame();
@@ -444,7 +449,7 @@ public class GameStage extends SurfaceView implements Runnable {
      */
     public void onSensorChanged(SensorEvent event, Sensor accelerometer) {
         if (event.sensor == accelerometer) {
-            if (controlMode == ControlMode.TILT && isPlaying) {
+            if (controlMode == Controls.Mode.TILT && isPlaying) {
                 int x = Math.round(event.values[0]);
                 int y = Math.round(event.values[1]);
                 boolean xStrongerThanY = Math.abs(x) > Math.abs(y);
@@ -457,15 +462,15 @@ public class GameStage extends SurfaceView implements Runnable {
                         //DOWN  : +y
                         if (xStrongerThanY) {
                             if (x > 0) {
-                                snake.setCurrentDirection(Snake.Direction.LEFT);
+                                snake.setDirectionLeft();
                             } else {
-                                snake.setCurrentDirection(Snake.Direction.RIGHT);
+                                snake.setDirectionRight();
                             }
                         } else {
                             if (y > 0) {
-                                snake.setCurrentDirection(Snake.Direction.DOWN);
+                                snake.setDirectionDown();
                             } else {
-                                snake.setCurrentDirection(Snake.Direction.UP);
+                                snake.setDirectionUp();
                             }
                         }
                         break;
@@ -476,15 +481,15 @@ public class GameStage extends SurfaceView implements Runnable {
                         //DOWN  : +x
                         if (xStrongerThanY) {
                             if (x > 0) {
-                                snake.setCurrentDirection(Snake.Direction.DOWN);
+                                snake.setDirectionDown();
                             } else {
-                                snake.setCurrentDirection(Snake.Direction.UP);
+                                snake.setDirectionUp();
                             }
                         } else {
                             if (y > 0) {
-                                snake.setCurrentDirection(Snake.Direction.RIGHT);
+                                snake.setDirectionRight();
                             } else {
-                                snake.setCurrentDirection(Snake.Direction.LEFT);
+                                snake.setDirectionLeft();
                             }
                         }
                         break;
@@ -495,15 +500,15 @@ public class GameStage extends SurfaceView implements Runnable {
                         //DOWN  : -y
                         if (xStrongerThanY) {
                             if (x > 0) {
-                                snake.setCurrentDirection(Snake.Direction.RIGHT);
+                                snake.setDirectionRight();
                             } else {
-                                snake.setCurrentDirection(Snake.Direction.LEFT);
+                                snake.setDirectionLeft();
                             }
                         } else {
                             if (y > 0) {
-                                snake.setCurrentDirection(Snake.Direction.UP);
+                                snake.setDirectionUp();
                             } else {
-                                snake.setCurrentDirection(Snake.Direction.DOWN);
+                                snake.setDirectionDown();
                             }
                         }
                         break;
@@ -514,15 +519,15 @@ public class GameStage extends SurfaceView implements Runnable {
                         //DOWN  : -x
                         if (xStrongerThanY) {
                             if (x > 0) {
-                                snake.setCurrentDirection(Snake.Direction.UP);
+                                snake.setDirectionUp();
                             } else {
-                                snake.setCurrentDirection(Snake.Direction.DOWN);
+                                snake.setDirectionDown();
                             }
                         } else {
                             if (y > 0) {
-                                snake.setCurrentDirection(Snake.Direction.LEFT);
+                                snake.setDirectionLeft();
                             } else {
-                                snake.setCurrentDirection(Snake.Direction.RIGHT);
+                                snake.setDirectionRight();
                             }
                         }
                         break;

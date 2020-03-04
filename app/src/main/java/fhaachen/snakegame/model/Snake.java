@@ -1,33 +1,45 @@
 package fhaachen.snakegame.model;
 
 public class Snake {
-
-    public enum Direction {
+    private enum Direction {
         UP,
         RIGHT,
         DOWN,
         LEFT
     }
 
-    public final int[] bodyXs;
-    public final int[] bodyYs;
+    private final int[] bodyXs;
+    private final int[] bodyYs;
     private int snakeLength;
 
     private Direction currentDirection;
 
-    public Snake(int initX, int initY, Direction direction, int maxLength) {
+    /**
+     * Default constructor to initialize a new Snake
+     *
+     * @param initX     x value of start point
+     * @param initY     y value of start point
+     * @param maxLength Max length that can be reached before the screen is full
+     */
+    public Snake(int initX, int initY, int maxLength) {
         bodyXs = new int[maxLength];
         bodyYs = new int[maxLength];
         bodyXs[0] = initX;
         bodyYs[0] = initY;
-        currentDirection = direction;
+        currentDirection = Direction.RIGHT;
         snakeLength = 0;
     }
 
+    /**
+     * Increases the snake length by one
+     */
     public void increaseSize() {
         snakeLength++;
     }
 
+    /**
+     * Moves the snake on step to the current direction
+     */
     public void moveSnake() {
         // Move the body
         for (int i = getSnakeLength(); i > 0; --i) {
@@ -61,20 +73,67 @@ public class Snake {
     }
 
     // Getters / Setters =========================================================================
+
+    /**
+     * Returns the x coordinate of the snake head
+     *
+     * @return the x coordinate of the head
+     */
     public int getHeadX() {
-        return bodyXs[0];
+        return getBodyX(0);
     }
 
+    /**
+     * Returns the y coordinate of the snake head
+     *
+     * @return the y coordinate of the head
+     */
     public int getHeadY() {
-        return bodyYs[0];
+        return getBodyY(0);
     }
 
+    /**
+     * Returns all x coordinates where a part of the snake is present
+     *
+     * @return Array of x coordinates
+     */
+    public int[] getBodyXs() {
+        return bodyXs;
+    }
+
+    /**
+     * Returns all y coordinates where a part of the snake is present
+     *
+     * @return Array of y coordinates
+     */
+    public int[] getBodyYs() {
+        return bodyYs;
+    }
+
+    public int getBodyX(int index) {
+        return bodyXs[index];
+    }
+
+    public int getBodyY(int index) {
+        return bodyYs[index];
+    }
+
+    /**
+     * Returns the current length of the snake
+     *
+     * @return snake length
+     */
     public int getSnakeLength() {
         return snakeLength;
     }
 
-    public void setCurrentDirection(Direction direction) {
-        // shouldn't change direction if new direction is opposite from previews
+    /**
+     * Sets the new direction. Prevents if the direction is opposite the current one
+     *
+     * @param direction new direction
+     */
+    private void setCurrentDirection(Direction direction) {
+        // shouldn't change direction if new direction is opposite from previous
         switch (direction) {
             case UP:
                 if (getCurrentDirection() != Direction.DOWN) {
@@ -99,6 +158,39 @@ public class Snake {
         }
     }
 
+    /**
+     * Sets the snake direction to left
+     */
+    public void setDirectionLeft() {
+        setCurrentDirection(Direction.LEFT);
+    }
+
+    /**
+     * Sets the snake direction to up
+     */
+    public void setDirectionUp() {
+        setCurrentDirection(Direction.UP);
+    }
+
+    /**
+     * Sets the snake direction to right
+     */
+    public void setDirectionRight() {
+        setCurrentDirection(Direction.RIGHT);
+    }
+
+    /**
+     * Sets the snake direction to down
+     */
+    public void setDirectionDown() {
+        setCurrentDirection(Direction.DOWN);
+    }
+
+    /**
+     * Returns the direction in which the snake currently points
+     *
+     * @return current direction
+     */
     private Direction getCurrentDirection() {
         return currentDirection;
     }

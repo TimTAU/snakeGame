@@ -3,10 +3,8 @@
     <string name="current_score">Score: %s</string>
     <string name="play">Play</string>
     <string name="highscore">Highscore:</string>
-    <string name="_000">000</string>
     <string name="sound">Sound</string>
     <string name="exit">Exit</string>
     <string name="gyros">Gyros</string>
-    <string name="menu">menu</string>
     <string name="your_score">Your Score:</string>
 </resources>

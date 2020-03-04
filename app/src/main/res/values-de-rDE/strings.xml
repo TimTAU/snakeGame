@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="current_score">Punktestand: %s</string>
-    <string name="last_score">Letzter Punktestand: %s</string>
-    <string name="start_game_prompt">Zum Starten Bildschirm berühren</string>
-    <string name="congratulations">Glückwunsch, du hast das Spiel beendet</string>
     <string name="play">Play</string>
     <string name="highscore">Highscore:</string>
-    <string name="_000">000</string>
     <string name="sound">Sound</string>
     <string name="exit">Exit</string>
     <string name="gyros">Gyros</string>
-    <string name="menu">menu</string>
     <string name="your_score">Your Score:</string>
 </resources>
