@@ -3,7 +3,6 @@
     <color name="controllers">#88303F9F</color>
     <color name="food">#FF4081</color>
     <color name="snake">@android:color/black</color>
-    <color name="text">@android:color/white</color>
     <color name="textColorLight">#c5d1e0</color>
     <color name="textColorDark">@android:color/black</color>
 </resources>

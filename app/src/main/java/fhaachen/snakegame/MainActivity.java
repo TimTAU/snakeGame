@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.Display;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import fhaachen.snakegame.ui.GameStage;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
@@ -44,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onBackPressed() {
         gameStage.showPauseDialog(this);
-
     }
 
     @Override
@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
         gameStage.showPauseDialog(this);
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        // Start game stage thread
     }
 
     @Override
@@ -78,6 +77,4 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onPointerCaptureChanged(boolean hasCapture) {
         //Do nothing
     }
-
-
 }
