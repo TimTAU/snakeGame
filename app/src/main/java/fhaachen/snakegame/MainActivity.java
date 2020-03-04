@@ -1,6 +1,11 @@
 package fhaachen.snakegame;
 
+import android.content.Context;
 import android.graphics.Point;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.Display;
 
@@ -8,8 +13,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import fhaachen.snakegame.ui.GameStage;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private GameStage gameStage;
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,12 +34,19 @@ public class MainActivity extends AppCompatActivity {
 
         // Set game stage as view
         setContentView(gameStage);
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager != null) {
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        }
+        //TODO: else Disable Gyros cope setting
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         // Start game stage thread
         gameStage.resume();
     }
@@ -43,5 +57,21 @@ public class MainActivity extends AppCompatActivity {
 
         // Stop game stage thread
         gameStage.pause();
+        sensorManager.unregisterListener(this);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        gameStage.onSensorChanged(event, accelerometer);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        //Do nothing
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+        //Do nothing
     }
 }
