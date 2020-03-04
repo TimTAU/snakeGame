@@ -2,7 +2,6 @@ package fhaachen.snakegame.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,7 +15,6 @@ import android.hardware.SensorEvent;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Display;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -63,14 +61,10 @@ public class GameStage extends SurfaceView implements Runnable {
     private Rect food;
     private int score;
 
-    //Messages
+    //Message
     private String currentScoreMsg;
-    private String lastScoreMsg;
-    private String startPromptMsg;
-    private String congratulationsMsg;
 
     //Colors
-    private final int textColor;
     private int scoreTextColor;
     private final int snakeColor;
     private final int foodColor;
@@ -91,14 +85,10 @@ public class GameStage extends SurfaceView implements Runnable {
         final Resources contextResources = getContext().getResources();
         final Resources.Theme contextTheme = getContext().getTheme();
 
-        //Set messages
+        //Set message
         currentScoreMsg = getContext().getString(R.string.current_score);
-        lastScoreMsg = getContext().getString(R.string.last_score);
-        startPromptMsg = getContext().getString(R.string.start_game_prompt);
-        congratulationsMsg = getContext().getString(R.string.congratulations);
 
         //Set colors
-        textColor = contextResources.getColor(R.color.text, contextTheme);
         snakeColor = contextResources.getColor(R.color.snake, contextTheme);
         foodColor = contextResources.getColor(R.color.food, contextTheme);
         controllersColor = contextResources.getColor(R.color.controllers, contextTheme);
@@ -387,38 +377,28 @@ public class GameStage extends SurfaceView implements Runnable {
 
     }
 
+    @SuppressLint("InflateParams")
+    // Pass null as the parent view because its going in the dialog layout
     public void showPauseDialog(final AppCompatActivity currentActivity) {
-        if (isPlaying)
+        if (isPlaying) {
             pause();
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
 
-        LayoutInflater inflater = currentActivity.getLayoutInflater();
-
         // Inflate and set the layout for the dialog
-        // Pass null as the parent view because its going in the dialog layout
-        builder
-                .setView(inflater.inflate(R.layout.pause_menu, null))
-                .setPositiveButton(R.string.play, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        if (snake == null) {
-                            startGame();
-                        }
-                        resume();
-
+        builder.setView(currentActivity.getLayoutInflater().inflate(R.layout.pause_menu, null))
+                .setPositiveButton(R.string.play, (dialog, id) -> {
+                    if (snake == null) {
+                        startGame();
                     }
+                    resume();
                 })
-                .setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        currentActivity.finishAndRemoveTask();
-                    }
-                });
+                .setNegativeButton(R.string.exit, (dialog, id) -> currentActivity.finishAndRemoveTask());
 
         runOnUiThread(() -> {
             builder.create().show();
         });
-
     }
 
     public static void runOnUiThread(Runnable runnable) {
