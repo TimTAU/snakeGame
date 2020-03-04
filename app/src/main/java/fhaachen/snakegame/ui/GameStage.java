@@ -319,7 +319,7 @@ public class GameStage extends SurfaceView implements Runnable {
             if (isPlaying) {
                 drawGame(canvas, paint);
             } else {
-                drawStart(canvas, paint);
+                drawStart();
             }
 
             surfaceHolder.unlockCanvasAndPost(canvas);
@@ -370,7 +370,7 @@ public class GameStage extends SurfaceView implements Runnable {
     }
 
 
-    private void drawStart(Canvas canvas, Paint paint) {
+    private void drawStart() {
 
         if (died) {
 
@@ -379,7 +379,7 @@ public class GameStage extends SurfaceView implements Runnable {
             TextView tv = findViewById(R.id.your_score);
             if (tv != null) {
                 tv.setVisibility(VISIBLE);
-                tv.setText("" + score);
+                tv.setText(score);
             }
             showPauseDialog((AppCompatActivity) context);
             died = false;

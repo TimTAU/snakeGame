@@ -10,7 +10,7 @@
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_descriptor">
         <activity android:name=".MainActivity"
-            android:screenOrientation="fullSensor">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
