@@ -2,6 +2,7 @@ package fhaachen.snakegame.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -9,59 +10,68 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.TextView;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import fhaachen.snakegame.R;
 import fhaachen.snakegame.model.Controls;
 import fhaachen.snakegame.model.Snake;
 
 @SuppressLint("ViewConstructor")
 public class GameStage extends SurfaceView implements Runnable {
+    private Context context;
     private int numBlocksWide = 40;
     private long fps = 7;
-    private final SurfaceHolder surfaceHolder;
-    private final Paint paint;
+    private SurfaceHolder surfaceHolder;
+    private Paint paint;
     private Thread thread = null;
     private volatile boolean isRunning;
     private volatile boolean isPlaying;
-    private final int screenX;
-    private final int screenY;
-    private final int snakeBlockSize;
-    private final int numBlocksHigh;
+    private int screenX;
+    private int screenY;
+    private int snakeBlockSize;
+    private int numBlocksHigh;
     private long nextFrameTime;
-    private final int maxBlocksOnScreen;
+    private int maxBlocksOnScreen;
 
     private Snake snake;
-    private final Controls controls;
-    private final Rect food;
+    private Controls controls;
+    private Rect food;
     private int score;
 
     //Messages
-    private final String currentScoreMsg;
-    private final String lastScoreMsg;
-    private final String startPromptMsg;
-    private final String congratulationsMsg;
+    private String currentScoreMsg;
+    private String lastScoreMsg;
+    private String startPromptMsg;
+    private String congratulationsMsg;
 
     //Colors
-    private final int textColor;
-    private final int snakeColor;
-    private final int foodColor;
-    private final int controllersColor;
+    private int textColor;
+    private int snakeColor;
+    private int foodColor;
+    private int controllersColor;
 
     //Bitmaps
-    private final Bitmap backgroundBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.background_image);
-    private final Bitmap foodBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.apple_icon);
-    private final Bitmap snakeHeadBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.snake_head);
-    private final Bitmap snakeBodyBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.snake_body);
+    private Bitmap backgroundBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.background_image);
+    private Bitmap foodBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.apple_icon);
+    private Bitmap snakeHeadBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.snake_head);
+    private Bitmap snakeBodyBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.snake_body);
+    private boolean died = false;
 
     public GameStage(Context context, Point size) {
         super(context);
+        this.context = context;
 
         //Set messages
         currentScoreMsg = getContext().getString(R.string.current_score);
@@ -127,10 +137,11 @@ public class GameStage extends SurfaceView implements Runnable {
      * Resumes the game after counter hits zero
      */
     public void resume() {
-        //TODO: Timer on restart
-        isRunning = true;
-        thread = new Thread(this);
-        thread.start();
+        if (!isRunning) {
+            isRunning = true;
+            thread = new Thread(this);
+            thread.start();
+        }
     }
 
     /**
@@ -201,6 +212,8 @@ public class GameStage extends SurfaceView implements Runnable {
 
         if (detectDeath()) {
             isPlaying = false;
+            died = true;
+            snake = null;
         }
     }
 
@@ -243,6 +256,7 @@ public class GameStage extends SurfaceView implements Runnable {
         // Hit nothing
         return false;
     }
+
 
     /**
      * Draws the game field
@@ -303,42 +317,23 @@ public class GameStage extends SurfaceView implements Runnable {
         canvas.drawText(String.format(currentScoreMsg, score), 10, 60, paint);
     }
 
-    @SuppressWarnings("IntegerDivisionInFloatingPointContext")
+
     private void drawStart(Canvas canvas, Paint paint) {
-        // Set text color
-        paint.setColor(textColor);
-        paint.setTextSize(70);
 
-        int halfScreen = screenX / 2;
-        int halfText;
-        if (score > 0) {
-            String msgScore = String.format(lastScoreMsg, score);
-            float scoreMeasure = paint.measureText(msgScore);
+        if (died) {
 
-            halfText = Math.round(scoreMeasure / 2);
 
-            canvas.drawText(
-                    msgScore,
-                    halfScreen - halfText,
-                    (screenY / 2) - 100, paint);
+            TextView tvl = findViewById(R.id.your_score_label);
+            if (tvl != null) tvl.setVisibility(VISIBLE);
+            TextView tv = findViewById(R.id.your_score);
+            if (tv != null) {
+                tv.setVisibility(VISIBLE);
+                tv.setText("" + score);
+            }
+            showPauseDialog((AppCompatActivity) context);
+            died = false;
         }
 
-        if (score >= (maxBlocksOnScreen - 1)) {
-            float congratsMeasure = paint.measureText(congratulationsMsg);
-
-            halfText = Math.round(congratsMeasure / 2);
-
-            canvas.drawText(
-                    congratulationsMsg,
-                    halfScreen - halfText,
-                    (screenY / 2) - 200, paint);
-        }
-
-        float startMeasure = paint.measureText(startPromptMsg);
-
-        halfText = Math.round(startMeasure / 2);
-
-        canvas.drawText(startPromptMsg, halfScreen - halfText, screenY / 2, paint);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -364,4 +359,47 @@ public class GameStage extends SurfaceView implements Runnable {
         }
         return super.onTouchEvent(motionEvent);
     }
+
+    public void showPauseDialog(final AppCompatActivity currentActivity) {
+        if (isPlaying)
+            pause();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
+
+        LayoutInflater inflater = currentActivity.getLayoutInflater();
+
+        // Inflate and set the layout for the dialog
+        // Pass null as the parent view because its going in the dialog layout
+        builder
+                .setView(inflater.inflate(R.layout.pause_menu, null))
+                .setPositiveButton(R.string.play, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        if (snake == null) {
+                            startGame();
+                        }
+                        resume();
+
+                    }
+                })
+                .setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        currentActivity.finishAndRemoveTask();
+                    }
+                });
+
+
+        runOnUiThread(() -> {
+            builder.create().show();
+        });
+
+    }
+
+
+    public static void runOnUiThread(Runnable runnable) {
+        final Handler UIHandler = new Handler(Looper.getMainLooper());
+        UIHandler.post(runnable);
+    }
+
+
 }

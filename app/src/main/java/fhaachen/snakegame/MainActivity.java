@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.Display;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import fhaachen.snakegame.ui.GameStage;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,11 +29,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        gameStage.showPauseDialog(this);
+
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
-
+        gameStage.showPauseDialog(this);
         // Start game stage thread
-        gameStage.resume();
     }
 
     @Override
@@ -43,5 +47,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Stop game stage thread
         gameStage.pause();
+
     }
+
+
 }
