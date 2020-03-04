@@ -2,6 +2,7 @@ package fhaachen.snakegame.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -20,6 +21,7 @@ import java.util.Random;
 import fhaachen.snakegame.R;
 import fhaachen.snakegame.model.Controls;
 import fhaachen.snakegame.model.Snake;
+import fhaachen.snakegame.model.Theme;
 
 @SuppressLint("ViewConstructor")
 public class GameStage extends SurfaceView implements Runnable {
@@ -50,18 +52,22 @@ public class GameStage extends SurfaceView implements Runnable {
 
     //Colors
     private final int textColor;
+    private int scoreTextColor;
     private final int snakeColor;
     private final int foodColor;
     private final int controllersColor;
 
     //Bitmaps
-    private final Bitmap backgroundBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.background_image);
-    private final Bitmap foodBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.apple_icon);
-    private final Bitmap snakeHeadBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.snake_head);
-    private final Bitmap snakeBodyBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.snake_body);
+    private Bitmap backgroundBitmap;
+    private Bitmap foodBitmap;
+    private Bitmap snakeHeadBitmap;
+    private Bitmap snakeBodyBitmap;
 
     public GameStage(Context context, Point size) {
         super(context);
+        //Context variables for later use
+        final Resources contextResources = getContext().getResources();
+        final Resources.Theme contextTheme = getContext().getTheme();
 
         //Set messages
         currentScoreMsg = getContext().getString(R.string.current_score);
@@ -70,10 +76,32 @@ public class GameStage extends SurfaceView implements Runnable {
         congratulationsMsg = getContext().getString(R.string.congratulations);
 
         //Set colors
-        textColor = getContext().getResources().getColor(R.color.text, getContext().getTheme());
-        snakeColor = getContext().getResources().getColor(R.color.snake, getContext().getTheme());
-        foodColor = getContext().getResources().getColor(R.color.food, getContext().getTheme());
-        controllersColor = getContext().getResources().getColor(R.color.controllers, getContext().getTheme());
+        textColor = contextResources.getColor(R.color.text, contextTheme);
+        snakeColor = contextResources.getColor(R.color.snake, contextTheme);
+        foodColor = contextResources.getColor(R.color.food, contextTheme);
+        controllersColor = contextResources.getColor(R.color.controllers, contextTheme);
+        int textColorLight = contextResources.getColor(R.color.textColorLight, contextTheme);
+        int textColorDark = contextResources.getColor(R.color.textColorDark, contextTheme);
+
+        //Theme switch
+        //TODO: Read theme setting
+        Theme theme = Theme.GRASS;
+        switch (theme) {
+            case GRASS:
+                backgroundBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.background_grass);
+                foodBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.food_apple);
+                snakeHeadBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_head);
+                snakeBodyBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_body);
+                scoreTextColor = textColorDark;
+                break;
+            case WATER:
+                backgroundBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.background_water_new);
+                foodBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.food_fish);
+                snakeHeadBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_water_head);
+                snakeBodyBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_water_body);
+                scoreTextColor = textColorLight;
+                break;
+        }
 
         //Set screen size
         screenX = size.x;
@@ -300,6 +328,7 @@ public class GameStage extends SurfaceView implements Runnable {
 
         // Scale the HUD text
         paint.setTextSize(70);
+        paint.setColor(scoreTextColor);
         canvas.drawText(String.format(currentScoreMsg, score), 10, 60, paint);
     }
 
