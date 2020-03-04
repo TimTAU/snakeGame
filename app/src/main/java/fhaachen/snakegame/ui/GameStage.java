@@ -3,6 +3,7 @@ package fhaachen.snakegame.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,13 +21,11 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.WindowManager;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Objects;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -34,8 +33,6 @@ import fhaachen.snakegame.R;
 import fhaachen.snakegame.model.Controls;
 import fhaachen.snakegame.model.Snake;
 import fhaachen.snakegame.model.Theme;
-
-import static androidx.core.content.ContextCompat.getSystemService;
 
 @SuppressLint("ViewConstructor")
 public class GameStage extends SurfaceView implements Runnable, DialogInterface.OnDismissListener {
@@ -55,6 +52,9 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     private final int maxBlocksOnScreen;
     private final Display display;
     private final Controls.Mode controlMode = Controls.Mode.BUTTONS;
+    private final AppCompatActivity activity;
+
+    private final int requestedOrientationOnStart;
 
     private Snake snake;
     private final Controls controls;
@@ -77,7 +77,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     private Bitmap snakeHeadBitmap;
     private Bitmap snakeBodyBitmap;
 
-    public GameStage(Context context, Point size) {
+    public GameStage(Context context) {
         super(context);
         //Context variables for later use
         Resources contextResources = getContext().getResources();
@@ -115,11 +115,21 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
                 break;
         }
 
+        //Activity
+        activity = (AppCompatActivity) getContext();
+
+        //TODO: Further analysis WARUM DER KACK NICHT FUNKTIONIERT
+        requestedOrientationOnStart = activity.getRequestedOrientation();
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+
+        // Get the pixel dimensions of the screen
+        display = activity.getWindowManager().getDefaultDisplay();
+        // Initialize the result into a Point object
+        Point size = new Point();
+        display.getSize(size);
         //Set screen size
         screenX = size.x;
         screenY = size.y;
-
-        display = Objects.requireNonNull(getSystemService(context, WindowManager.class)).getDefaultDisplay();
 
         surfaceHolder = getHolder();
         paint = new Paint();
@@ -149,6 +159,9 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
 
     @Override
     public void run() {
+        AppCompatActivity activity = (AppCompatActivity) getContext();
+        int orientationOnStart = activity.getRequestedOrientation();
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         while (isRunning) {
             if (updateRequired()) {
                 if (isPlaying) {
@@ -157,6 +170,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
                 draw();
             }
         }
+        activity.setRequestedOrientation(orientationOnStart);
     }
 
     /**
@@ -182,15 +196,16 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
 
     @SuppressLint("InflateParams")
     // Pass null as the parent view because its going in the dialog layout
-    public void showPauseDialog(AppCompatActivity currentActivity) {
+    public void showPauseDialog() {
+        activity.setRequestedOrientation(requestedOrientationOnStart);
         pauseMenuShown = true;
-        AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
         // Inflate and set the layout for the dialog
-        builder.setView(currentActivity.getLayoutInflater().inflate(R.layout.pause_menu, null))
+        builder.setView(activity.getLayoutInflater().inflate(R.layout.pause_menu, null))
                 .setTitle(menuTitle)
                 .setPositiveButton(R.string.play, (dialog, id) -> startGameAndClosePauseMenu())
-                .setNegativeButton(R.string.exit, (dialog, id) -> currentActivity.finishAndRemoveTask())
+                .setNegativeButton(R.string.exit, (dialog, id) -> activity.finishAndRemoveTask())
                 .setOnDismissListener(this);
 
         runOnUiThread(() -> builder.create().show());
@@ -207,6 +222,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     }
 
     private void startGameAndClosePauseMenu() {
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         startGame();
         pauseMenuShown = false;
         isRunning = true;
@@ -364,7 +380,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
                     lastScore.setText(score);
                 }
             }
-            showPauseDialog((AppCompatActivity) getContext());
+            showPauseDialog();
         }
     }
 

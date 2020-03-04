@@ -1,13 +1,11 @@
 package fhaachen.snakegame;
 
 import android.content.Context;
-import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.view.Display;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -22,15 +20,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Get the pixel dimensions of the screen
-        Display display = getWindowManager().getDefaultDisplay();
-
-        // Initialize the result into a Point object
-        Point size = new Point();
-        display.getSize(size);
-
         // Create a game stage
-        gameStage = new GameStage(this, size);
+        gameStage = new GameStage(this);
 
         // Set game stage as view
         setContentView(gameStage);
@@ -44,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onBackPressed() {
-        gameStage.showPauseDialog(this);
+        gameStage.showPauseDialog();
     }
 
     @Override
