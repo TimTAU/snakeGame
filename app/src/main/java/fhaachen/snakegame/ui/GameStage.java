@@ -3,6 +3,7 @@ package fhaachen.snakegame.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -10,23 +11,33 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import fhaachen.snakegame.R;
+import fhaachen.snakegame.model.ControlMode;
 import fhaachen.snakegame.model.Controls;
 import fhaachen.snakegame.model.Snake;
+import fhaachen.snakegame.model.Theme;
+
+import static androidx.core.content.ContextCompat.getSystemService;
 
 @SuppressLint("ViewConstructor")
 public class GameStage extends SurfaceView implements Runnable {
@@ -44,6 +55,8 @@ public class GameStage extends SurfaceView implements Runnable {
     private int numBlocksHigh;
     private long nextFrameTime;
     private int maxBlocksOnScreen;
+    private Display display;
+    private final ControlMode controlMode = ControlMode.TILT;
 
     private Snake snake;
     private Controls controls;
@@ -57,21 +70,26 @@ public class GameStage extends SurfaceView implements Runnable {
     private String congratulationsMsg;
 
     //Colors
-    private int textColor;
-    private int snakeColor;
-    private int foodColor;
-    private int controllersColor;
+    private final int textColor;
+    private int scoreTextColor;
+    private final int snakeColor;
+    private final int foodColor;
+    private final int controllersColor;
 
     //Bitmaps
-    private Bitmap backgroundBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.background_image);
-    private Bitmap foodBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.apple_icon);
-    private Bitmap snakeHeadBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.snake_head);
-    private Bitmap snakeBodyBitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.snake_body);
+    private Bitmap backgroundBitmap;
+    private Bitmap foodBitmap;
+    private Bitmap snakeHeadBitmap;
+    private Bitmap snakeBodyBitmap;
+
     private boolean died = false;
 
     public GameStage(Context context, Point size) {
         super(context);
         this.context = context;
+        //Context variables for later use
+        final Resources contextResources = getContext().getResources();
+        final Resources.Theme contextTheme = getContext().getTheme();
 
         //Set messages
         currentScoreMsg = getContext().getString(R.string.current_score);
@@ -80,14 +98,39 @@ public class GameStage extends SurfaceView implements Runnable {
         congratulationsMsg = getContext().getString(R.string.congratulations);
 
         //Set colors
-        textColor = getContext().getResources().getColor(R.color.text, getContext().getTheme());
-        snakeColor = getContext().getResources().getColor(R.color.snake, getContext().getTheme());
-        foodColor = getContext().getResources().getColor(R.color.food, getContext().getTheme());
-        controllersColor = getContext().getResources().getColor(R.color.controllers, getContext().getTheme());
+        textColor = contextResources.getColor(R.color.text, contextTheme);
+        snakeColor = contextResources.getColor(R.color.snake, contextTheme);
+        foodColor = contextResources.getColor(R.color.food, contextTheme);
+        controllersColor = contextResources.getColor(R.color.controllers, contextTheme);
+        int textColorLight = contextResources.getColor(R.color.textColorLight, contextTheme);
+        int textColorDark = contextResources.getColor(R.color.textColorDark, contextTheme);
+
+        //Theme switch
+        //TODO: Read theme setting
+        Theme theme = Theme.GRASS;
+        switch (theme) {
+            //noinspection ConstantConditions TODO: Delete noinspect after setting implementation
+            case GRASS:
+                backgroundBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.background_grass);
+                foodBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.food_apple);
+                snakeHeadBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_head);
+                snakeBodyBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_body);
+                scoreTextColor = textColorDark;
+                break;
+            case WATER:
+                backgroundBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.background_water_new);
+                foodBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.food_fish);
+                snakeHeadBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_water_head);
+                snakeBodyBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_water_body);
+                scoreTextColor = textColorLight;
+                break;
+        }
 
         //Set screen size
         screenX = size.x;
         screenY = size.y;
+
+        display = Objects.requireNonNull(getSystemService(context, WindowManager.class)).getDefaultDisplay();
 
         surfaceHolder = getHolder();
         paint = new Paint();
@@ -100,9 +143,15 @@ public class GameStage extends SurfaceView implements Runnable {
         numBlocksHigh = screenY / snakeBlockSize;
         maxBlocksOnScreen = numBlocksWide * numBlocksHigh;
 
-        int controlButtonSize = snakeBlockSize * 3;
-        int controlsY = screenY - (controlButtonSize * 3) - snakeBlockSize;
-        controls = new Controls(snakeBlockSize, controlsY, controlButtonSize);
+        //Prepares the button draw if needed
+        //noinspection ConstantConditions TODO: Delete noinspect after setting implementation
+        if (controlMode == ControlMode.BUTTONS) {
+            int controlButtonSize = snakeBlockSize * 3;
+            int controlsY = screenY - (controlButtonSize * 3) - snakeBlockSize;
+            controls = new Controls(snakeBlockSize, controlsY, controlButtonSize);
+        } else {
+            controls = null;
+        }
 
         food = new Rect();
 
@@ -281,14 +330,16 @@ public class GameStage extends SurfaceView implements Runnable {
         // Set controls color
         paint.setColor(controllersColor);
 
-        // Draw controls
-        for (Rect control : controls.getButtons()) {
-            canvas.drawRect(
-                    control.left,
-                    control.top,
-                    control.right,
-                    control.bottom,
-                    paint);
+        // Draw controls if needed
+        if (controlMode == ControlMode.BUTTONS && controls != null) {
+            for (Rect control : controls.getButtons()) {
+                canvas.drawRect(
+                        control.left,
+                        control.top,
+                        control.right,
+                        control.bottom,
+                        paint);
+            }
         }
 
         // Draw food
@@ -314,6 +365,7 @@ public class GameStage extends SurfaceView implements Runnable {
 
         // Scale the HUD text
         paint.setTextSize(70);
+        paint.setColor(scoreTextColor);
         canvas.drawText(String.format(currentScoreMsg, score), 10, 60, paint);
     }
 
@@ -321,7 +373,6 @@ public class GameStage extends SurfaceView implements Runnable {
     private void drawStart(Canvas canvas, Paint paint) {
 
         if (died) {
-
 
             TextView tvl = findViewById(R.id.your_score_label);
             if (tvl != null) tvl.setVisibility(VISIBLE);
@@ -334,30 +385,6 @@ public class GameStage extends SurfaceView implements Runnable {
             died = false;
         }
 
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    @Override
-    public boolean onTouchEvent(MotionEvent motionEvent) {
-        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-            if (isPlaying) {
-                int posX = Math.round(motionEvent.getX());
-                int posY = Math.round(motionEvent.getY());
-
-                if (controls.getButton(Controls.Button.LEFT).contains(posX, posY)) {
-                    snake.setCurrentDirection(Snake.Direction.LEFT);
-                } else if (controls.getButton(Controls.Button.UP).contains(posX, posY)) {
-                    snake.setCurrentDirection(Snake.Direction.UP);
-                } else if (controls.getButton(Controls.Button.RIGHT).contains(posX, posY)) {
-                    snake.setCurrentDirection(Snake.Direction.RIGHT);
-                } else if (controls.getButton(Controls.Button.DOWN).contains(posX, posY)) {
-                    snake.setCurrentDirection(Snake.Direction.DOWN);
-                }
-            } else {
-                startGame();
-            }
-        }
-        return super.onTouchEvent(motionEvent);
     }
 
     public void showPauseDialog(final AppCompatActivity currentActivity) {
@@ -388,18 +415,139 @@ public class GameStage extends SurfaceView implements Runnable {
                     }
                 });
 
-
         runOnUiThread(() -> {
             builder.create().show();
         });
 
     }
 
-
     public static void runOnUiThread(Runnable runnable) {
         final Handler UIHandler = new Handler(Looper.getMainLooper());
         UIHandler.post(runnable);
     }
 
+    /**
+     * Method for button control
+     *
+     * @param motionEvent event from touch
+     * @return result of super call
+     */
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public boolean onTouchEvent(MotionEvent motionEvent) {
+        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+            if (controlMode == ControlMode.BUTTONS && isPlaying) {
+                int posX = Math.round(motionEvent.getX());
+                int posY = Math.round(motionEvent.getY());
 
+                if (controls.getButton(Controls.Button.LEFT).contains(posX, posY)) {
+                    snake.setCurrentDirection(Snake.Direction.LEFT);
+                } else if (controls.getButton(Controls.Button.UP).contains(posX, posY)) {
+                    snake.setCurrentDirection(Snake.Direction.UP);
+                } else if (controls.getButton(Controls.Button.RIGHT).contains(posX, posY)) {
+                    snake.setCurrentDirection(Snake.Direction.RIGHT);
+                } else if (controls.getButton(Controls.Button.DOWN).contains(posX, posY)) {
+                    snake.setCurrentDirection(Snake.Direction.DOWN);
+                }
+            } else {
+                startGame();
+            }
+        }
+        return super.onTouchEvent(motionEvent);
+    }
+
+    /**
+     * Method for tilt control
+     *
+     * @param event         event from the sensor
+     * @param accelerometer Sensor that fired the event
+     */
+    public void onSensorChanged(SensorEvent event, Sensor accelerometer) {
+        if (event.sensor == accelerometer) {
+            if (controlMode == ControlMode.TILT && isPlaying) {
+                int x = Math.round(event.values[0]);
+                int y = Math.round(event.values[1]);
+                boolean xStrongerThanY = Math.abs(x) > Math.abs(y);
+
+                switch (display.getRotation()) {
+                    case Surface.ROTATION_0:
+                        //LEFT  : +x
+                        //UP    : -y
+                        //RIGHT : -x
+                        //DOWN  : +y
+                        if (xStrongerThanY) {
+                            if (x > 0) {
+                                snake.setCurrentDirection(Snake.Direction.LEFT);
+                            } else {
+                                snake.setCurrentDirection(Snake.Direction.RIGHT);
+                            }
+                        } else {
+                            if (y > 0) {
+                                snake.setCurrentDirection(Snake.Direction.DOWN);
+                            } else {
+                                snake.setCurrentDirection(Snake.Direction.UP);
+                            }
+                        }
+                        break;
+                    case Surface.ROTATION_90:
+                        //LEFT  : -y
+                        //UP    : -x
+                        //RIGHT : +y
+                        //DOWN  : +x
+                        if (xStrongerThanY) {
+                            if (x > 0) {
+                                snake.setCurrentDirection(Snake.Direction.DOWN);
+                            } else {
+                                snake.setCurrentDirection(Snake.Direction.UP);
+                            }
+                        } else {
+                            if (y > 0) {
+                                snake.setCurrentDirection(Snake.Direction.RIGHT);
+                            } else {
+                                snake.setCurrentDirection(Snake.Direction.LEFT);
+                            }
+                        }
+                        break;
+                    case Surface.ROTATION_180:
+                        //LEFT  : -x
+                        //UP    : +y
+                        //RIGHT : +x
+                        //DOWN  : -y
+                        if (xStrongerThanY) {
+                            if (x > 0) {
+                                snake.setCurrentDirection(Snake.Direction.RIGHT);
+                            } else {
+                                snake.setCurrentDirection(Snake.Direction.LEFT);
+                            }
+                        } else {
+                            if (y > 0) {
+                                snake.setCurrentDirection(Snake.Direction.UP);
+                            } else {
+                                snake.setCurrentDirection(Snake.Direction.DOWN);
+                            }
+                        }
+                        break;
+                    case Surface.ROTATION_270:
+                        //LEFT  : +y
+                        //UP    : +x
+                        //RIGHT : -y
+                        //DOWN  : -x
+                        if (xStrongerThanY) {
+                            if (x > 0) {
+                                snake.setCurrentDirection(Snake.Direction.UP);
+                            } else {
+                                snake.setCurrentDirection(Snake.Direction.DOWN);
+                            }
+                        } else {
+                            if (y > 0) {
+                                snake.setCurrentDirection(Snake.Direction.LEFT);
+                            } else {
+                                snake.setCurrentDirection(Snake.Direction.RIGHT);
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+    }
 }
