@@ -70,10 +70,10 @@ public class GameStage extends SurfaceView implements Runnable {
         congratulationsMsg = getContext().getString(R.string.congratulations);
 
         //Set colors
-        textColor = getContext().getResources().getColor(R.color.text);
-        snakeColor = getContext().getResources().getColor(R.color.snake);
-        foodColor = getContext().getResources().getColor(R.color.food);
-        controllersColor = getContext().getResources().getColor(R.color.controllers);
+        textColor = getContext().getResources().getColor(R.color.text, getContext().getTheme());
+        snakeColor = getContext().getResources().getColor(R.color.snake, getContext().getTheme());
+        foodColor = getContext().getResources().getColor(R.color.food, getContext().getTheme());
+        controllersColor = getContext().getResources().getColor(R.color.controllers, getContext().getTheme());
 
         //Set screen size
         screenX = size.x;

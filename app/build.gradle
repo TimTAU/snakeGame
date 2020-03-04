@@ -10,7 +10,6 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -24,12 +23,5 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Android
-    //newer version breaks building
-    //noinspection GradleDependency
-    implementation "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
-
-    // Tests
-    testImplementation "junit:junit:$rootProject.ext.junitVersion"
-    androidTestImplementation "com.android.support.test:runner:$rootProject.ext.runnerVersion"
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
+    implementation "androidx.appcompat:appcompat:1.2.0-alpha02"
 }

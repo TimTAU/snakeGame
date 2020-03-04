@@ -24,14 +24,8 @@ task clean(type: Delete) {
 
 ext {
     // Sdk and tools
-    minSdkVersion = 21
-    targetSdkVersion = 27
-    compileSdkVersion = 27
-    buildToolsVersion = '27.0.3'
-
-    // App dependencies
-    supportLibraryVersion = '27.1.1'
-    junitVersion = '4.12'
-    runnerVersion = '1.0.2'
-    espressoVersion = '3.0.2'
+    minSdkVersion = 24
+    targetSdkVersion = 29
+    compileSdkVersion = 29
+    buildToolsVersion = '29.0.3'
 }

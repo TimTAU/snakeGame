@@ -2,8 +2,9 @@ package snakegame;
 
 import android.graphics.Point;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import snakegame.ui.GameStage;
 
