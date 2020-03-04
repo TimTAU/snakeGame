@@ -1,4 +1,4 @@
-package snakegame.model;
+package fhaachen.snakegame.model;
 
 import android.graphics.Rect;
 

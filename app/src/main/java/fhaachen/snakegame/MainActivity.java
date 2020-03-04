@@ -1,4 +1,4 @@
-package snakegame;
+package fhaachen.snakegame;
 
 import android.graphics.Point;
 import android.os.Bundle;
@@ -6,7 +6,7 @@ import android.view.Display;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import snakegame.ui.GameStage;
+import fhaachen.snakegame.ui.GameStage;
 
 public class MainActivity extends AppCompatActivity {
     private GameStage gameStage;

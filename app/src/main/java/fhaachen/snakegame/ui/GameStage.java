@@ -1,4 +1,4 @@
-package snakegame.ui;
+package fhaachen.snakegame.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -17,9 +17,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import snakegame.R;
-import snakegame.model.Controls;
-import snakegame.model.Snake;
+import fhaachen.snakegame.R;
+import fhaachen.snakegame.model.Controls;
+import fhaachen.snakegame.model.Snake;
 
 @SuppressLint("ViewConstructor")
 public class GameStage extends SurfaceView implements Runnable {
