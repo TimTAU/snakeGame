@@ -151,6 +151,11 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         numBlocksHigh = screenY / snakeBlockSize;
         maxBlocksOnScreen = numBlocksWide * numBlocksHigh;
 
+        //FIXME: Example for saving control setting
+        /*SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(activity.getString(R.string.setting_control), "GESTURES");
+        editor.apply();*/
+
         //Prepares the button draw if needed
         controlMode = Controls.Mode.valueOf(sharedPref.getString(activity.getString(R.string.setting_control), defaultControlMode));
         if (controlMode == Controls.Mode.BUTTONS) {
