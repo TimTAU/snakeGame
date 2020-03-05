@@ -12,8 +12,8 @@
     <string name="swype">Swype</string>
     <string name="grass">Grass</string>
     <string name="water">Water</string>
-    <string name="setting_theme" translatable="false" />
-    <string name="setting_control" translatable="false" />
+    <string name="setting_theme" translatable="false">settingTheme</string>
+    <string name="setting_control" translatable="false">settingControl</string>
     <string name="setting_theme_default" translatable="false">GRASS</string>
     <string name="setting_control_default" translatable="false">GESTURES</string>
 </resources>
