@@ -70,12 +70,14 @@
             android:id="@+id/theme_grass_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="onThemeSelected"
             android:text="@string/grass" />
 
         <RadioButton
             android:id="@+id/theme_water_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="onThemeSelected"
             android:text="@string/water" />
 
     </RadioGroup>
@@ -92,18 +94,21 @@
             android:id="@+id/control_buttons_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="onControlSelected"
             android:text="@string/buttons" />
 
         <RadioButton
             android:id="@+id/control_swype_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="onControlSelected"
             android:text="@string/swype" />
 
         <RadioButton
             android:id="@+id/control_tilt_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="onControlSelected"
             android:text="@string/tilt" />
     </RadioGroup>
 

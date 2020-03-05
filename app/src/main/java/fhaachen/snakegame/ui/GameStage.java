@@ -53,11 +53,14 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     private long nextFrameTime;
     private final int maxBlocksOnScreen;
     private final Display display;
-    private final Controls.Mode controlMode;
+    private Controls.Mode controlMode;
     private final AppCompatActivity activity;
 
+    private final SharedPreferences sharedPref;
+    private final SharedPreferences.Editor sharedPreferencesEditor;
+
     private Snake snake;
-    private final Controls controls;
+    private Controls controls;
     private final Rect food;
     private int score;
 
@@ -77,6 +80,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     private Bitmap snakeHeadBitmap;
     private Bitmap snakeBodyBitmap;
 
+    @SuppressLint("CommitPrefEdits") //Commitment will be done later
     public GameStage(Context context) {
         super(context);
         //Activity
@@ -87,24 +91,17 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         Resources.Theme contextTheme = activity.getTheme();
 
         //Shared preferences
-        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        sharedPreferencesEditor = sharedPref.edit();
 
         //Get resource strings
         menuTitle = activity.getString(R.string.app_name);
         currentScoreMsg = activity.getString(R.string.current_score);
-        String settingTheme = activity.getString(R.string.setting_theme);
-        String settingControlMode = activity.getString(R.string.setting_control);
 
         //Get colors
         snakeColor = contextResources.getColor(R.color.snake, contextTheme);
         foodColor = contextResources.getColor(R.color.food, contextTheme);
         controllersColor = contextResources.getColor(R.color.controllers, contextTheme);
-        int textColorLight = contextResources.getColor(R.color.textColorLight, contextTheme);
-        int textColorDark = contextResources.getColor(R.color.textColorDark, contextTheme);
-
-        //Default settings
-        String defaultTheme = contextResources.getString(R.string.setting_theme_default);
-        String defaultControlMode = contextResources.getString(R.string.setting_control_default);
 
         //FIXME: Example for saving theme setting
         /*SharedPreferences.Editor editor = sharedPref.edit();
@@ -112,23 +109,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         editor.apply();*/
 
         //Theme switch
-        Theme theme = Theme.valueOf(sharedPref.getString(settingTheme, defaultTheme));
-        switch (theme) {
-            case GRASS:
-                backgroundBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.background_grass);
-                foodBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.food_apple);
-                snakeHeadBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_head);
-                snakeBodyBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_body);
-                scoreTextColor = textColorDark;
-                break;
-            case WATER:
-                backgroundBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.background_water_new);
-                foodBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.food_fish);
-                snakeHeadBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_water_head);
-                snakeBodyBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_water_body);
-                scoreTextColor = textColorLight;
-                break;
-        }
+        updateTheme();
 
         //Orientation lock
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
@@ -159,14 +140,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         editor.apply();*/
 
         //Prepares the button draw if needed
-        controlMode = Controls.Mode.valueOf(sharedPref.getString(settingControlMode, defaultControlMode));
-        if (controlMode == Controls.Mode.BUTTONS) {
-            int controlButtonSize = snakeBlockSize * 3;
-            int controlsY = screenY - (controlButtonSize * 3) - snakeBlockSize;
-            controls = new Controls(snakeBlockSize, controlsY, controlButtonSize);
-        } else {
-            controls = null;
-        }
+        updateControlMode();
 
         food = new Rect();
 
@@ -444,6 +418,46 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         canvas.drawText(String.format(currentScoreMsg, score), 10, 60, paint);
     }
 
+    private void updateTheme() {
+        Context applicationContext = getContext().getApplicationContext();
+        Resources contextResources = applicationContext.getResources();
+        Resources.Theme contextTheme = applicationContext.getTheme();
+        String defaultTheme = contextResources.getString(R.string.setting_theme_default);
+
+        Theme theme = Theme.valueOf(sharedPref.getString(applicationContext.getString(R.string.setting_theme), defaultTheme));
+        switch (theme) {
+            case GRASS:
+                backgroundBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.background_grass);
+                foodBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.food_apple);
+                snakeHeadBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_head);
+                snakeBodyBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_body);
+                scoreTextColor = contextResources.getColor(R.color.textColorDark, contextTheme);
+                break;
+            case WATER:
+                backgroundBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.background_water_new);
+                foodBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.food_fish);
+                snakeHeadBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_water_head);
+                snakeBodyBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.snake_water_body);
+                scoreTextColor = contextResources.getColor(R.color.textColorLight, contextTheme);
+                break;
+        }
+    }
+
+    private void updateControlMode() {
+        Context applicationContext = getContext().getApplicationContext();
+        Resources contextResources = applicationContext.getResources();
+        String defaultControlMode = contextResources.getString(R.string.setting_control_default);
+
+        controlMode = Controls.Mode.valueOf(sharedPref.getString(applicationContext.getString(R.string.setting_control), defaultControlMode));
+        if (controlMode == Controls.Mode.BUTTONS) {
+            int controlButtonSize = snakeBlockSize * 3;
+            int controlsY = screenY - (controlButtonSize * 3) - snakeBlockSize;
+            controls = new Controls(snakeBlockSize, controlsY, controlButtonSize);
+        } else {
+            controls = null;
+        }
+    }
+
     /**
      * Method for button control
      *
@@ -595,5 +609,54 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
             return false;
         }
         return true;
+    }
+
+    public void onControlSelected(View v) {
+        switch (v.getId()) {
+            case R.id.control_buttons_button:
+                updateControlModeIfRequired(Controls.Mode.BUTTONS.toString());
+                break;
+            case R.id.control_swype_button:
+                updateControlModeIfRequired(Controls.Mode.GESTURES.toString());
+                break;
+            case R.id.control_tilt_button:
+                updateControlModeIfRequired(Controls.Mode.TILT.toString());
+        }
+    }
+
+    private void updateControlModeIfRequired(String value) {
+        Context applicationContext = getContext().getApplicationContext();
+        String defaultControl = applicationContext.getResources().getString(R.string.setting_control_default);
+
+        if (!(sharedPref.getString(applicationContext.getString(R.string.setting_control), defaultControl).equals(value))) {
+            setSharedPreference(R.string.setting_control, value);
+            updateControlMode();
+        }
+    }
+
+    public void onThemeSelected(View v) {
+        switch (v.getId()) {
+            case R.id.theme_grass_button:
+                updateThemeIfRequired(Theme.GRASS.toString());
+                break;
+            case R.id.theme_water_button:
+                updateThemeIfRequired(Theme.WATER.toString());
+                break;
+        }
+    }
+
+    private void updateThemeIfRequired(String value) {
+        Context applicationContext = getContext().getApplicationContext();
+        String defaultTheme = applicationContext.getResources().getString(R.string.setting_theme_default);
+
+        if (!(sharedPref.getString(applicationContext.getString(R.string.setting_theme), defaultTheme).equals(value))) {
+            setSharedPreference(R.string.setting_theme, value);
+            updateTheme();
+        }
+    }
+
+    private void setSharedPreference(int activityKey, String value) {
+        sharedPreferencesEditor.putString(activity.getString(activityKey), value);
+        sharedPreferencesEditor.apply();
     }
 }

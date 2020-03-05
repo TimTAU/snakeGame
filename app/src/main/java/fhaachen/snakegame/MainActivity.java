@@ -8,6 +8,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -114,5 +115,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         return gameStage.onFling(velocityX, velocityY);
+    }
+
+    public void onControlSelected(View v) {
+        gameStage.onControlSelected(v);
+    }
+
+    public void onThemeSelected(View v) {
+        gameStage.onThemeSelected(v);
     }
 }
