@@ -3,6 +3,12 @@ package fhaachen.snakegame.model;
 import android.graphics.Rect;
 
 public class Controls {
+    public enum Mode {
+        BUTTONS,
+        TILT,
+        @SuppressWarnings("unused") GESTURES //TODO: Implement gestures
+    }
+
     public enum Button {
         UP,
         RIGHT,
@@ -45,22 +51,17 @@ public class Controls {
     }
 
     public Rect getButton(Button button) {
-        Rect btn;
         switch (button) {
             case LEFT:
-                btn = buttons[0];
-                break;
+                return buttons[0];
             case UP:
-                btn = buttons[1];
-                break;
+                return buttons[1];
             case RIGHT:
-                btn = buttons[2];
-                break;
-            default:
-                btn = buttons[3];
-                break;
+                return buttons[2];
+            case DOWN:
+                return buttons[3];
         }
-        return btn;
+        throw new RuntimeException("Button couldn't be evaluated");
     }
 
     public Rect[] getButtons() {
