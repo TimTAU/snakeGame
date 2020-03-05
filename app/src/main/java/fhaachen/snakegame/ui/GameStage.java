@@ -51,7 +51,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     private long nextFrameTime;
     private final int maxBlocksOnScreen;
     private final Display display;
-    private final Controls.Mode controlMode = Controls.Mode.BUTTONS;
+    private final Controls.Mode controlMode = Controls.Mode.GESTURES;
     private final AppCompatActivity activity;
 
     private Snake snake;
@@ -322,7 +322,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
      * @return true if death is detected
      */
     private boolean detectDeath() {
-        // Hit the screen edge
+        /*// Hit the screen edge
         if (snake.getHeadX() == -1 || snake.getHeadX() >= numBlocksWide + 1 || snake.getHeadY() == -1 || snake.getHeadY() == numBlocksHigh + 1) {
             return true;
         }
@@ -334,7 +334,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
                     && (snake.getHeadY() == snake.getBodyY(i))) {
                 return true;
             }
-        }
+        }*/
 
         // Hit nothing
         return false;
@@ -542,5 +542,31 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
                 }
             }
         }
+    }
+
+    /**
+     * Method for fling/gesture control
+     *
+     * @param velocityX range swiped on x axis
+     * @param velocityY range swiped on y axis
+     * @return true because
+     */
+    public boolean onFling(float velocityX, float velocityY) {
+        if (controlMode == Controls.Mode.GESTURES) {
+            if (Math.abs(velocityX) > Math.abs(velocityY)) {
+                if (velocityX > 0) {
+                    snake.setDirectionRight();
+                } else {
+                    snake.setDirectionLeft();
+                }
+            } else {
+                if (velocityY > 0) {
+                    snake.setDirectionDown();
+                } else {
+                    snake.setDirectionUp();
+                }
+            }
+        }
+        return true;
     }
 }
