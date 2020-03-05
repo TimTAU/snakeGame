@@ -25,12 +25,11 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import java.util.Random;
 import java.util.stream.IntStream;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import fhaachen.snakegame.R;
 import fhaachen.snakegame.model.Controls;
 import fhaachen.snakegame.model.Snake;
@@ -38,6 +37,7 @@ import fhaachen.snakegame.model.Theme;
 
 @SuppressLint("ViewConstructor")
 public class GameStage extends SurfaceView implements Runnable, DialogInterface.OnDismissListener {
+
     private int numBlocksWide = 40;
     private long fps = 7;
     private final SurfaceHolder surfaceHolder;
@@ -77,6 +77,11 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     private Bitmap snakeHeadBitmap;
     private Bitmap snakeBodyBitmap;
 
+    //Shared Preferences
+    private final SharedPreferences sharedPref;
+    private final String saveHighscore;
+    private final String saveLastscore;
+
     public GameStage(Context context) {
         super(context);
         //Activity
@@ -87,11 +92,13 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         Resources.Theme contextTheme = activity.getTheme();
 
         //Shared preferences
-        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
 
         //Get resource strings
         menuTitle = activity.getString(R.string.app_name);
-        currentScoreMsg = activity.getString(R.string.current_score);
+        currentScoreMsg = activity.getString(R.string.label_current_score);
+        saveHighscore = activity.getString(R.string.save_highscore);
+        saveLastscore = activity.getString(R.string.save_lastscore);
         String settingTheme = activity.getString(R.string.setting_theme);
         String settingControlMode = activity.getString(R.string.setting_control);
 
@@ -208,7 +215,8 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
 
     @SuppressLint("InflateParams")
     // Pass null as the parent view because its going in the dialog layout
-    public void showPauseDialog() {
+    public void showMenuDialog() {
+
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         pauseMenuShown = true;
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -217,25 +225,34 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         View view = activity.getLayoutInflater().inflate(R.layout.pause_menu, null);
         builder.setView(view)
                 .setTitle(menuTitle)
-                .setPositiveButton(R.string.play, (dialog, id) -> startGameAndClosePauseMenu())
-                .setNegativeButton(R.string.exit, (dialog, id) -> activity.finishAndRemoveTask())
+                .setPositiveButton(R.string.button_play, (dialog, id) -> startGameAndClosePauseMenu())
+                .setNegativeButton(R.string.button_exit, (dialog, id) -> activity.finishAndRemoveTask())
                 .setOnDismissListener(this);
 
         TextView lastScoreLabel = view.findViewById(R.id.your_score_label);
         TextView lastScore = view.findViewById(R.id.your_score);
-        if (score != 0) {
-            lastScoreLabel.setVisibility(VISIBLE);
-            lastScore.setVisibility(VISIBLE);
-            lastScore.setText(String.valueOf(score));
-        } else {
-            lastScoreLabel.setVisibility(INVISIBLE);
-            lastScore.setVisibility(INVISIBLE);
-        }
+        TextView highScore = view.findViewById(R.id.highscore);
+
+        lastScore.setText(String.valueOf(sharedPref.getInt(saveLastscore, 0)));
+        highScore.setText(String.valueOf(sharedPref.getInt(saveHighscore, 0)));
 
         runOnUiThread(() -> {
             builder.create();
             builder.show();
         });
+    }
+
+    private void saveScores(int score) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        int highscore = sharedPref.getInt(saveHighscore, 0);
+
+        editor.putInt(activity.getString(R.string.save_lastscore), score);
+        editor.commit();
+
+        if (score > highscore) {
+            editor.putInt(activity.getString(R.string.save_highscore), score);
+            editor.commit();
+        }
     }
 
     @Override
@@ -346,6 +363,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         snake.moveSnake();
 
         if (detectDeath()) {
+            saveScores(score);
             isPlaying = false;
             snake = null;
         }
@@ -387,18 +405,11 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
             if (isPlaying && !pauseMenuShown) {
                 drawGame(canvas, paint);
             } else {
-                drawStart();
+                showMenuDialog();
             }
 
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
-    }
-
-    private void drawStart() {
-
-        showPauseDialog();
-
-
     }
 
     private void drawGame(Canvas canvas, Paint paint) {

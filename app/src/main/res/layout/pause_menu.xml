@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="@string/highscore"
+        android:text="@string/label_highscore"
         app:layout_constraintStart_toStartOf="@+id/theme_label"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        android:text="@string/your_score"
+        android:text="@string/label_your_score"
         app:layout_constraintStart_toStartOf="@+id/theme_label"
         app:layout_constraintTop_toBottomOf="@+id/highscore_label" />
 
@@ -42,7 +42,7 @@
         android:id="@+id/control_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/control"
+        android:text="@string/label_control"
         app:layout_constraintEnd_toEndOf="@+id/control_group"
         app:layout_constraintStart_toStartOf="@+id/control_group"
         app:layout_constraintTop_toTopOf="@+id/theme_label" />
@@ -52,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="@string/theme"
+        android:text="@string/label_theme"
         app:layout_constraintEnd_toEndOf="@+id/themes_group"
         app:layout_constraintStart_toStartOf="@+id/themes_group"
         app:layout_constraintTop_toBottomOf="@id/your_score_label" />
@@ -70,13 +70,13 @@
             android:id="@+id/theme_grass_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/grass" />
+            android:text="@string/game_theme_grass" />
 
         <RadioButton
             android:id="@+id/theme_water_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/water" />
+            android:text="@string/game_theme_water" />
 
     </RadioGroup>
 
@@ -92,19 +92,19 @@
             android:id="@+id/control_buttons_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/buttons" />
+            android:text="@string/game_controls_buttons" />
 
         <RadioButton
             android:id="@+id/control_swype_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/swype" />
+            android:text="@string/game_controls_swype" />
 
         <RadioButton
             android:id="@+id/control_tilt_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/tilt" />
+            android:text="@string/game_controls_tilt" />
     </RadioGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onBackPressed() {
-        gameStage.showPauseDialog();
+        gameStage.showMenuDialog();
     }
 
     @Override

@@ -1,19 +1,26 @@
 <resources>
     <string name="app_name" translatable="false">SnakeGame</string>
-    <string name="current_score">Score: %s</string>
-    <string name="play">Play</string>
-    <string name="highscore">Highscore:</string>
-    <string name="exit">Exit</string>
-    <string name="tilt">Tilt</string>
-    <string name="your_score">Your Score:</string>
-    <string name="control">Control</string>
-    <string name="theme">Theme</string>
-    <string name="buttons">Buttons</string>
-    <string name="swype">Swype</string>
-    <string name="grass">Grass</string>
-    <string name="water">Water</string>
+
+    <string name="button_exit">Exit</string>
+    <string name="button_play">Play</string>
+
+    <string name="label_current_score">Score: %s</string>
+    <string name="label_highscore">Highscore:</string>
+    <string name="label_your_score">Last Score:</string>
+    <string name="label_control">Control</string>
+    <string name="label_theme">Theme</string>
+
+    <string name="game_controls_tilt">Tilt</string>
+    <string name="game_controls_buttons">Buttons</string>
+    <string name="game_controls_swype">Swype</string>
+    <string name="game_theme_grass">Grass</string>
+    <string name="game_theme_water">Water</string>
+
     <string name="setting_theme" translatable="false">settingTheme</string>
     <string name="setting_control" translatable="false">settingControl</string>
     <string name="setting_theme_default" translatable="false">GRASS</string>
     <string name="setting_control_default" translatable="false">GESTURES</string>
+
+    <string name="save_highscore" translatable="false">save_highscore</string>
+    <string name="save_lastscore" translatable="false">save_lastscore</string>
 </resources>
