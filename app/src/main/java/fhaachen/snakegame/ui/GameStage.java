@@ -52,7 +52,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     private long nextFrameTime;
     private final int maxBlocksOnScreen;
     private final Display display;
-    private final Controls.Mode controlMode = Controls.Mode.GESTURES;
+    private final Controls.Mode controlMode;
     private final AppCompatActivity activity;
 
     private Snake snake;
@@ -100,15 +100,17 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         int textColorLight = contextResources.getColor(R.color.textColorLight, contextTheme);
         int textColorDark = contextResources.getColor(R.color.textColorDark, contextTheme);
 
+        //Default settings
+        String defaultTheme = contextResources.getString(R.string.setting_theme_default);
+        String defaultControlMode = contextResources.getString(R.string.setting_control_default);
+
         //FIXME: Example for saving theme setting
         /*SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(activity.getString(R.string.setting_theme), "WATER");
         editor.apply();*/
 
         //Theme switch
-        String defaultTheme = contextResources.getString(R.string.setting_theme_default);
         Theme theme = Theme.valueOf(sharedPref.getString(activity.getString(R.string.setting_theme), defaultTheme));
-
         switch (theme) {
             case GRASS:
                 backgroundBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.background_grass);
@@ -150,7 +152,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         maxBlocksOnScreen = numBlocksWide * numBlocksHigh;
 
         //Prepares the button draw if needed
-        //noinspection ConstantConditions TODO: Delete noinspect after setting implementation
+        controlMode = Controls.Mode.valueOf(sharedPref.getString(activity.getString(R.string.setting_control), defaultControlMode));
         if (controlMode == Controls.Mode.BUTTONS) {
             int controlButtonSize = snakeBlockSize * 3;
             int controlsY = screenY - (controlButtonSize * 3) - snakeBlockSize;
