@@ -10,7 +10,7 @@ object GameHelper {
      */
     fun detectDeath(snake: Snake, numBlocksWide: Int, numBlocksHigh: Int): Boolean {
         // Hit the screen edge
-        if (snake.headX == -1 || snake.headX >= numBlocksWide + 1 || snake.headY == -1 || snake.headY == numBlocksHigh + 1) {
+        if (edgeHitDetection(snake, numBlocksWide, numBlocksHigh)) {
             return true
         }
         // Hit itself
@@ -23,6 +23,14 @@ object GameHelper {
         }
         // Hit nothing
         return false
+    }
+
+    private fun edgeHitDetection(snake: Snake, width: Int, height: Int): Boolean {
+        return if (width > height) {
+            snake.headX == -1 || snake.headX >= width + 1 || snake.headY == -1 || snake.headY == height + 1
+        } else {
+            snake.headX == -1 || snake.headX >= width || snake.headY == -1 || snake.headY == height + 1
+        }
     }
 
     //FIXME
