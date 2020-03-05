@@ -89,12 +89,13 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         //Shared preferences
         SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
 
-        //Set resource strings
+        //Get resource strings
         menuTitle = activity.getString(R.string.app_name);
         currentScoreMsg = activity.getString(R.string.current_score);
         String settingTheme = activity.getString(R.string.setting_theme);
+        String settingControlMode = activity.getString(R.string.setting_control);
 
-        //Set colors
+        //Get colors
         snakeColor = contextResources.getColor(R.color.snake, contextTheme);
         foodColor = contextResources.getColor(R.color.food, contextTheme);
         controllersColor = contextResources.getColor(R.color.controllers, contextTheme);
@@ -111,7 +112,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         editor.apply();*/
 
         //Theme switch
-        Theme theme = Theme.valueOf(sharedPref.getString(activity.getString(R.string.setting_theme), defaultTheme));
+        Theme theme = Theme.valueOf(sharedPref.getString(settingTheme, defaultTheme));
         switch (theme) {
             case GRASS:
                 backgroundBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.background_grass);
@@ -158,7 +159,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         editor.apply();*/
 
         //Prepares the button draw if needed
-        controlMode = Controls.Mode.valueOf(sharedPref.getString(activity.getString(R.string.setting_control), defaultControlMode));
+        controlMode = Controls.Mode.valueOf(sharedPref.getString(settingControlMode, defaultControlMode));
         if (controlMode == Controls.Mode.BUTTONS) {
             int controlButtonSize = snakeBlockSize * 3;
             int controlsY = screenY - (controlButtonSize * 3) - snakeBlockSize;
