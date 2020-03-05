@@ -26,6 +26,10 @@ class Snake(initX: Int, initY: Int, maxLength: Int) {
      */
     var snakeLength: Int
         private set
+
+    /**
+     * Direction the snake is moving to
+     */
     private var currentDirection: Direction
 
     /**

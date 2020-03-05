@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener, GestureDetector.O
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        gameStage.onSensorChanged(event, accelerometer)
+        gameStage.onSensorChanged(event, accelerometer!!)
     }
 
     override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
