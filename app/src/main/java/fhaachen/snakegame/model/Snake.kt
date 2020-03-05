@@ -139,10 +139,9 @@ class Snake(initX: Int, initY: Int, maxLength: Int) {
 
     /**
      * Default constructor to initialize a new Snake
-     *
-     * @param initX     x value of start point
-     * @param initY     y value of start point
-     * @param maxLength Max length that can be reached before the screen is full
+     * x value of start point
+     * y value of start point
+     * Max length that can be reached before the screen is full
      */
     init {
         bodyXs[0] = initX
