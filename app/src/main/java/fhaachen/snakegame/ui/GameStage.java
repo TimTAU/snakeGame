@@ -438,7 +438,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         setSharedPreference(R.string.save_lastscore, score);
 
         if (score > highscore) {
-            setSharedPreference(R.string.save_highscore, highscore);
+            setSharedPreference(R.string.save_highscore, score);
         }
     }
 
