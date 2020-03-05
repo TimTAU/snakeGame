@@ -621,7 +621,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
      * @return true when event is consumed
      */
     public boolean onFling(float velocityX, float velocityY) {
-        if (controlMode == Controls.Mode.GESTURES) {
+        if (controlMode == Controls.Mode.GESTURES && isPlaying) {
             if (Math.abs(velocityX) > Math.abs(velocityY)) {
                 if (velocityX > 0) {
                     snake.setDirectionRight();
