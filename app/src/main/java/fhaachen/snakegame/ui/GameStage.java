@@ -223,22 +223,12 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         TextView lastScoreLabel = (TextView) view.findViewById(R.id.your_score_label);
         TextView lastScore = (TextView) view.findViewById(R.id.your_score);
         if (score != 0) {
-            if (lastScoreLabel != null) {
-                lastScoreLabel.setVisibility(VISIBLE);
-            }
-            if (lastScore != null) {
-                lastScore.setVisibility(VISIBLE);
-
-                lastScore.setText(Integer.toString(score));
-            }
+            lastScoreLabel.setVisibility(VISIBLE);
+            lastScore.setVisibility(VISIBLE);
+            lastScore.setText(Integer.toString(score));
         } else {
-
-            if (lastScoreLabel != null) {
-                lastScoreLabel.setVisibility(INVISIBLE);
-            }
-            if (lastScore != null) {
-                lastScore.setVisibility(INVISIBLE);
-            }
+            lastScoreLabel.setVisibility(INVISIBLE);
+            lastScore.setVisibility(INVISIBLE);
 
         }
 
