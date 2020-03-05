@@ -5,7 +5,7 @@
     <string name="highscore">Highscore:</string>
     <string name="sound">Sound</string>
     <string name="exit">Exit</string>
-    <string name="gyros">Gyros</string>
+    <string name="tilt">Gyros</string>
     <string name="your_score">Your Score:</string>
     <string name="control">Control</string>
     <string name="theme">Theme</string>

@@ -8,6 +8,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
@@ -33,8 +34,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager != null) {
             accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        } else {
+            //Disable Tilt setting if accelerometer is not available
+            TextView tiltSetting = findViewById(R.id.control_tilt_button);
+            if (tiltSetting != null) {
+                tiltSetting.setClickable(false);
+            }
         }
-        //TODO: else Disable Gyros cope setting
 
         gestureDetector = new GestureDetectorCompat(this, this);
     }
