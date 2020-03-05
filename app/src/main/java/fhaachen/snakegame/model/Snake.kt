@@ -39,12 +39,11 @@ class Snake(initX: Int, initY: Int, maxLength: Int) {
      * Moves the snake on step to the current direction
      */
     fun moveSnake() { // Move the body
-        for (i in snakeLength downTo 1) { // Start at the back and move it
-// to the position of the segment in front of it
+        for (i in snakeLength downTo 1) {
+            // Start at the back and move it to the position of the segment in front of it
             bodyXs[i] = bodyXs[i - 1]
             bodyYs[i] = bodyYs[i - 1]
-            // Exclude the head because
-// the head has nothing in front of it
+            // Exclude the head because the head has nothing in front of it
         }
         when (getCurrentDirection()) {
             Direction.UP -> bodyYs[0]--
@@ -53,6 +52,7 @@ class Snake(initX: Int, initY: Int, maxLength: Int) {
             Direction.LEFT -> bodyXs[0]--
         }
     }
+
     // Getters / Setters =========================================================================
     /**
      * Returns the x coordinate of the snake head
@@ -83,7 +83,8 @@ class Snake(initX: Int, initY: Int, maxLength: Int) {
      *
      * @param direction new direction
      */
-    private fun setCurrentDirection(direction: Direction) { // shouldn't change direction if new direction is opposite from previous
+    private fun setCurrentDirection(direction: Direction) {
+        // shouldn't change direction if new direction is opposite from previous
         when (direction) {
             Direction.UP -> if (getCurrentDirection() != Direction.DOWN) {
                 currentDirection = direction
