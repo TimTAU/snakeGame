@@ -21,14 +21,14 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.TextView;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Random;
 import java.util.stream.IntStream;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import fhaachen.snakegame.R;
 import fhaachen.snakegame.model.Controls;
 import fhaachen.snakegame.model.Snake;
@@ -189,18 +189,48 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     @SuppressLint("InflateParams")
     // Pass null as the parent view because its going in the dialog layout
     public void showPauseDialog() {
+
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         pauseMenuShown = true;
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
         // Inflate and set the layout for the dialog
-        builder.setView(activity.getLayoutInflater().inflate(R.layout.pause_menu, null))
+        View view = activity.getLayoutInflater().inflate(R.layout.pause_menu, null);
+        builder.setView(view)
                 .setTitle(menuTitle)
                 .setPositiveButton(R.string.play, (dialog, id) -> startGameAndClosePauseMenu())
                 .setNegativeButton(R.string.exit, (dialog, id) -> activity.finishAndRemoveTask())
                 .setOnDismissListener(this);
 
-        runOnUiThread(() -> builder.create().show());
+        TextView lastScoreLabel = (TextView) view.findViewById(R.id.your_score_label);
+        TextView lastScore = (TextView) view.findViewById(R.id.your_score);
+        if (score != 0) {
+            if (lastScoreLabel != null) {
+                lastScoreLabel.setVisibility(VISIBLE);
+            }
+            if (lastScore != null) {
+                lastScore.setVisibility(VISIBLE);
+
+                lastScore.setText(Integer.toString(score));
+            }
+        } else {
+
+            if (lastScoreLabel != null) {
+                lastScoreLabel.setVisibility(INVISIBLE);
+            }
+            if (lastScore != null) {
+                lastScore.setVisibility(INVISIBLE);
+            }
+
+        }
+
+        runOnUiThread(() -> {
+            builder.create();
+            builder.show();
+
+        });
+
+
     }
 
     @Override
@@ -360,20 +390,10 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     }
 
     private void drawStart() {
-        if (!isPlaying && !pauseMenuShown) {
-            if (score != 0) {
-                TextView lastScoreLabel = findViewById(R.id.your_score_label);
-                if (lastScoreLabel != null) {
-                    lastScoreLabel.setVisibility(VISIBLE);
-                }
-                TextView lastScore = findViewById(R.id.your_score);
-                if (lastScore != null) {
-                    lastScore.setVisibility(VISIBLE);
-                    lastScore.setText(score);
-                }
-            }
-            showPauseDialog();
-        }
+
+        showPauseDialog();
+
+
     }
 
     private void drawGame(Canvas canvas, Paint paint) {
