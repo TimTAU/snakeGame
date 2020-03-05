@@ -101,19 +101,19 @@
         app:layout_constraintTop_toTopOf="@+id/themes_group">
 
         <RadioButton
-            android:id="@+id/control_buttons_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="onControlSelected"
-            android:text="@string/game_controls_buttons"
-            android:textAppearance="@style/ScoreTheme" />
-
-        <RadioButton
             android:id="@+id/control_swype_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="onControlSelected"
             android:text="@string/game_controls_swype"
+            android:textAppearance="@style/ScoreTheme" />
+
+        <RadioButton
+            android:id="@+id/control_buttons_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="onControlSelected"
+            android:text="@string/game_controls_buttons"
             android:textAppearance="@style/ScoreTheme" />
 
         <RadioButton
