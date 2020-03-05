@@ -27,11 +27,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ContextThemeWrapper;
 
 import java.util.Random;
 import java.util.stream.IntStream;
 
-import androidx.appcompat.view.ContextThemeWrapper;
 import fhaachen.snakegame.R;
 import fhaachen.snakegame.model.Controls;
 import fhaachen.snakegame.model.Snake;
@@ -81,10 +81,6 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     private Bitmap snakeHeadBitmap;
     private Bitmap snakeBodyBitmap;
 
-    //Scores
-    private final String saveHighscore;
-    private final String saveLastscore;
-
     @SuppressLint("CommitPrefEdits") //Commitment will be done later
     public GameStage(Context context) {
         super(context);
@@ -102,18 +98,11 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         //Get resource strings
         menuTitle = activity.getString(R.string.app_name);
         currentScoreMsg = activity.getString(R.string.label_current_score);
-        saveHighscore = activity.getString(R.string.save_highscore);
-        saveLastscore = activity.getString(R.string.save_lastscore);
 
         //Get colors
         snakeColor = contextResources.getColor(R.color.snake, contextTheme);
         foodColor = contextResources.getColor(R.color.food, contextTheme);
         controllersColor = contextResources.getColor(R.color.controllers, contextTheme);
-
-        //FIXME: Example for saving theme setting
-        /*SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(activity.getString(R.string.setting_theme), "WATER");
-        editor.apply();*/
 
         //Theme switch
         updateTheme();
@@ -140,11 +129,6 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         snakeBlockSize = screenX / numBlocksWide;
         numBlocksHigh = screenY / snakeBlockSize;
         maxBlocksOnScreen = numBlocksWide * numBlocksHigh;
-
-        //FIXME: Example for saving control setting
-        /*SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(activity.getString(R.string.setting_control), "GESTURES");
-        editor.apply();*/
 
         //Prepares the button draw if needed
         updateControlMode();
@@ -202,30 +186,16 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
                 .setNegativeButton(R.string.button_exit, (dialog, id) -> activity.finishAndRemoveTask())
                 .setOnDismissListener(this);
 
-        TextView lastScoreLabel = view.findViewById(R.id.your_score_label);
         TextView lastScore = view.findViewById(R.id.your_score);
         TextView highScore = view.findViewById(R.id.highscore);
 
-        lastScore.setText(String.valueOf(sharedPref.getInt(saveLastscore, 0)));
-        highScore.setText(String.valueOf(sharedPref.getInt(saveHighscore, 0)));
+        lastScore.setText(String.valueOf(getSharedPreference(R.string.save_lastscore, 0)));
+        highScore.setText(String.valueOf(getSharedPreference(R.string.save_highscore, 0)));
 
         runOnUiThread(() -> {
             builder.create();
             builder.show();
         });
-    }
-
-    private void saveScores(int score) {
-        SharedPreferences.Editor editor = sharedPref.edit();
-        int highscore = sharedPref.getInt(saveHighscore, 0);
-
-        editor.putInt(activity.getString(R.string.save_lastscore), score);
-        editor.commit();
-
-        if (score > highscore) {
-            editor.putInt(activity.getString(R.string.save_highscore), score);
-            editor.commit();
-        }
     }
 
     @Override
@@ -428,13 +398,31 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         canvas.drawText(String.format(currentScoreMsg, score), 10, 60, paint);
     }
 
+    /**
+     * Writes given score and updates highscore if required
+     *
+     * @param score of last game
+     */
+    private void saveScores(int score) {
+        int highscore = getSharedPreference(R.string.save_highscore, 0);
+
+        setSharedPreference(R.string.save_lastscore, score);
+
+        if (score > highscore) {
+            setSharedPreference(R.string.save_highscore, highscore);
+        }
+    }
+
+    /**
+     * Updates the theme to the one stored in SavedPreferences
+     */
     private void updateTheme() {
         Context applicationContext = getContext().getApplicationContext();
         Resources contextResources = applicationContext.getResources();
         Resources.Theme contextTheme = applicationContext.getTheme();
         String defaultTheme = contextResources.getString(R.string.setting_theme_default);
 
-        Theme theme = Theme.valueOf(sharedPref.getString(applicationContext.getString(R.string.setting_theme), defaultTheme));
+        Theme theme = Theme.valueOf(getSharedPreference(R.string.setting_theme, defaultTheme));
         switch (theme) {
             case GRASS:
                 backgroundBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.background_grass);
@@ -453,6 +441,9 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         }
     }
 
+    /**
+     * Updates the control mode to the one stored in SavedPreferences
+     */
     private void updateControlMode() {
         Context applicationContext = getContext().getApplicationContext();
         Resources contextResources = applicationContext.getResources();
@@ -621,6 +612,11 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         return true;
     }
 
+    /**
+     * Assigns its {@link Controls.Mode} to the pressed radio button and updates the controls if required
+     *
+     * @param v pressed View
+     */
     public void onControlSelected(View v) {
         switch (v.getId()) {
             case R.id.control_buttons_button:
@@ -634,16 +630,25 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         }
     }
 
+    /**
+     * Checks if the setting is different from the previous one and triggers an update accordingly
+     *
+     * @param value of the {@link Controls.Mode} to be used
+     */
     private void updateControlModeIfRequired(String value) {
-        Context applicationContext = getContext().getApplicationContext();
-        String defaultControl = applicationContext.getResources().getString(R.string.setting_control_default);
+        String defaultControl = getContext().getApplicationContext().getResources().getString(R.string.setting_control_default);
 
-        if (!(sharedPref.getString(applicationContext.getString(R.string.setting_control), defaultControl).equals(value))) {
+        if (!(getSharedPreference(R.string.setting_control, defaultControl).equals(value))) {
             setSharedPreference(R.string.setting_control, value);
             updateControlMode();
         }
     }
 
+    /**
+     * Assigns its {@link Theme} to the pressed radio button and updates the theme if required
+     *
+     * @param v pressed View
+     */
     public void onThemeSelected(View v) {
         switch (v.getId()) {
             case R.id.theme_grass_button:
@@ -655,18 +660,61 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         }
     }
 
+    /**
+     * Checks if the setting is different from the previous one and triggers an update accordingly
+     *
+     * @param value of the {@link Theme} to be used
+     */
     private void updateThemeIfRequired(String value) {
-        Context applicationContext = getContext().getApplicationContext();
-        String defaultTheme = applicationContext.getResources().getString(R.string.setting_theme_default);
+        String defaultTheme = getContext().getApplicationContext().getResources().getString(R.string.setting_theme_default);
 
-        if (!(sharedPref.getString(applicationContext.getString(R.string.setting_theme), defaultTheme).equals(value))) {
+        if (!(getSharedPreference(R.string.setting_theme, defaultTheme).equals(value))) {
             setSharedPreference(R.string.setting_theme, value);
             updateTheme();
         }
     }
 
-    private void setSharedPreference(int activityKey, String value) {
-        sharedPreferencesEditor.putString(activity.getString(activityKey), value);
+    /**
+     * Gets the value to the given resourceStringValue-key
+     *
+     * @param resourceStringValue key to search by
+     * @param defaultValue        will be returned if there is no value to given key
+     * @return value to given key or default value
+     */
+    private String getSharedPreference(int resourceStringValue, String defaultValue) {
+        return sharedPref.getString(getContext().getApplicationContext().getString(resourceStringValue), defaultValue);
+    }
+
+    /**
+     * Gets the value to the given resourceStringValue-key
+     *
+     * @param resourceStringValue key to search by
+     * @param defaultValue        will be returned if there is no value to given key
+     * @return value to given key or default value
+     */
+    private int getSharedPreference(int resourceStringValue, @SuppressWarnings("SameParameterValue") int defaultValue) {
+        return sharedPref.getInt(getContext().getApplicationContext().getString(resourceStringValue), defaultValue);
+    }
+
+    /**
+     * Puts the given key value pair as an {@link SharedPreferences}
+     *
+     * @param resourceStringValue Resource string value
+     * @param value               String value to be matched
+     */
+    private void setSharedPreference(int resourceStringValue, String value) {
+        sharedPreferencesEditor.putString(getContext().getApplicationContext().getString(resourceStringValue), value);
+        sharedPreferencesEditor.apply();
+    }
+
+    /**
+     * Puts the given key value pair as an {@link SharedPreferences}
+     *
+     * @param resourceStringValue Resource string value
+     * @param value               int value to be matched
+     */
+    private void setSharedPreference(int resourceStringValue, int value) {
+        sharedPreferencesEditor.putInt(getContext().getApplicationContext().getString(resourceStringValue), value);
         sharedPreferencesEditor.apply();
     }
 }
