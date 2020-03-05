@@ -30,6 +30,7 @@ import java.util.stream.IntStream;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ContextThemeWrapper;
 import fhaachen.snakegame.R;
 import fhaachen.snakegame.model.Controls;
 import fhaachen.snakegame.model.Snake;
@@ -219,7 +220,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
 
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         pauseMenuShown = true;
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(getContext(), R.style.ScoreTheme));
 
         // Inflate and set the layout for the dialog
         View view = activity.getLayoutInflater().inflate(R.layout.pause_menu, null);
@@ -235,6 +236,8 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
 
         lastScore.setText(String.valueOf(sharedPref.getInt(saveLastscore, 0)));
         highScore.setText(String.valueOf(sharedPref.getInt(saveHighscore, 0)));
+
+
 
         runOnUiThread(() -> {
             builder.create();

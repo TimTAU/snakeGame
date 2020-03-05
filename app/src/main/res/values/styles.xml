@@ -9,4 +9,13 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
+
+    <!-- Scores -->
+    <style name="ScoreTheme" parent="android:Widget.TextView">
+
+        <item name="android:textColor">@color/textColorDark</item>
+        <item name="android:textSize">14dp</item>
+    </style>
+
+
 </resources>
