@@ -101,10 +101,10 @@
             android:text="@string/swype" />
 
         <RadioButton
-            android:id="@+id/control_gyro_button"
+            android:id="@+id/control_tilt_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/gyros" />
+            android:text="@string/tilt" />
     </RadioGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

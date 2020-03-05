@@ -3,9 +3,8 @@
     <string name="current_score">Score: %s</string>
     <string name="play">Play</string>
     <string name="highscore">Highscore:</string>
-    <string name="sound">Sound</string>
     <string name="exit">Exit</string>
-    <string name="gyros">Gyros</string>
+    <string name="tilt">Tilt</string>
     <string name="your_score">Your Score:</string>
     <string name="control">Control</string>
     <string name="theme">Theme</string>
@@ -13,4 +12,8 @@
     <string name="swype">Swype</string>
     <string name="grass">Grass</string>
     <string name="water">Water</string>
+    <string name="setting_theme" translatable="false" />
+    <string name="setting_control" translatable="false" />
+    <string name="setting_theme_default" translatable="false">GRASS</string>
+    <string name="setting_control_default" translatable="false">GESTURES</string>
 </resources>

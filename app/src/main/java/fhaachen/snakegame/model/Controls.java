@@ -6,7 +6,7 @@ public class Controls {
     public enum Mode {
         BUTTONS,
         TILT,
-        @SuppressWarnings("unused") GESTURES //TODO: Implement gestures
+        GESTURES
     }
 
     public enum Button {

@@ -3,6 +3,7 @@ package fhaachen.snakegame.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -51,7 +52,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     private long nextFrameTime;
     private final int maxBlocksOnScreen;
     private final Display display;
-    private final Controls.Mode controlMode = Controls.Mode.BUTTONS;
+    private final Controls.Mode controlMode;
     private final AppCompatActivity activity;
 
     private Snake snake;
@@ -77,13 +78,20 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
 
     public GameStage(Context context) {
         super(context);
+        //Activity
+        activity = (AppCompatActivity) getContext();
+
         //Context variables for later use
-        Resources contextResources = getContext().getResources();
-        Resources.Theme contextTheme = getContext().getTheme();
+        Resources contextResources = activity.getResources();
+        Resources.Theme contextTheme = activity.getTheme();
+
+        //Shared preferences
+        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
 
         //Set resource strings
-        menuTitle = getContext().getString(R.string.app_name);
-        currentScoreMsg = getContext().getString(R.string.current_score);
+        menuTitle = activity.getString(R.string.app_name);
+        currentScoreMsg = activity.getString(R.string.current_score);
+        String settingTheme = activity.getString(R.string.setting_theme);
 
         //Set colors
         snakeColor = contextResources.getColor(R.color.snake, contextTheme);
@@ -92,11 +100,18 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         int textColorLight = contextResources.getColor(R.color.textColorLight, contextTheme);
         int textColorDark = contextResources.getColor(R.color.textColorDark, contextTheme);
 
+        //Default settings
+        String defaultTheme = contextResources.getString(R.string.setting_theme_default);
+        String defaultControlMode = contextResources.getString(R.string.setting_control_default);
+
+        //FIXME: Example for saving theme setting
+        /*SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(activity.getString(R.string.setting_theme), "WATER");
+        editor.apply();*/
+
         //Theme switch
-        //TODO: Read theme setting
-        Theme theme = Theme.GRASS;
+        Theme theme = Theme.valueOf(sharedPref.getString(activity.getString(R.string.setting_theme), defaultTheme));
         switch (theme) {
-            //noinspection ConstantConditions TODO: Delete noinspect after setting implementation
             case GRASS:
                 backgroundBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.background_grass);
                 foodBitmap = BitmapFactory.decodeResource(contextResources, R.drawable.food_apple);
@@ -113,9 +128,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
                 break;
         }
 
-        //Activity
-        activity = (AppCompatActivity) getContext();
-
+        //Orientation lock
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
 
         // Get the pixel dimensions of the screen
@@ -138,8 +151,13 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         numBlocksHigh = screenY / snakeBlockSize;
         maxBlocksOnScreen = numBlocksWide * numBlocksHigh;
 
+        //FIXME: Example for saving control setting
+        /*SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(activity.getString(R.string.setting_control), "GESTURES");
+        editor.apply();*/
+
         //Prepares the button draw if needed
-        //noinspection ConstantConditions TODO: Delete noinspect after setting implementation
+        controlMode = Controls.Mode.valueOf(sharedPref.getString(activity.getString(R.string.setting_control), defaultControlMode));
         if (controlMode == Controls.Mode.BUTTONS) {
             int controlButtonSize = snakeBlockSize * 3;
             int controlsY = screenY - (controlButtonSize * 3) - snakeBlockSize;
@@ -562,5 +580,33 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
                 }
             }
         }
+    }
+
+    /**
+     * Method for fling/gesture control
+     *
+     * @param velocityX range swiped on x axis
+     * @param velocityY range swiped on y axis
+     * @return true when event is consumed
+     */
+    public boolean onFling(float velocityX, float velocityY) {
+        if (controlMode == Controls.Mode.GESTURES) {
+            if (Math.abs(velocityX) > Math.abs(velocityY)) {
+                if (velocityX > 0) {
+                    snake.setDirectionRight();
+                } else {
+                    snake.setDirectionLeft();
+                }
+            } else {
+                if (velocityY > 0) {
+                    snake.setDirectionDown();
+                } else {
+                    snake.setDirectionUp();
+                }
+            }
+        } else {
+            return false;
+        }
+        return true;
     }
 }
