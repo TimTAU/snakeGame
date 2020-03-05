@@ -80,6 +80,10 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     private Bitmap snakeHeadBitmap;
     private Bitmap snakeBodyBitmap;
 
+    //Scores
+    private final String saveHighscore;
+    private final String saveLastscore;
+
     @SuppressLint("CommitPrefEdits") //Commitment will be done later
     public GameStage(Context context) {
         super(context);
@@ -96,7 +100,9 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
 
         //Get resource strings
         menuTitle = activity.getString(R.string.app_name);
-        currentScoreMsg = activity.getString(R.string.current_score);
+        currentScoreMsg = activity.getString(R.string.label_current_score);
+        saveHighscore = activity.getString(R.string.save_highscore);
+        saveLastscore = activity.getString(R.string.save_lastscore);
 
         //Get colors
         snakeColor = contextResources.getColor(R.color.snake, contextTheme);
@@ -182,7 +188,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
 
     @SuppressLint("InflateParams")
     // Pass null as the parent view because its going in the dialog layout
-    public void showPauseDialog() {
+    public void showMenuDialog() {
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         pauseMenuShown = true;
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -191,25 +197,34 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         View view = activity.getLayoutInflater().inflate(R.layout.pause_menu, null);
         builder.setView(view)
                 .setTitle(menuTitle)
-                .setPositiveButton(R.string.play, (dialog, id) -> startGameAndClosePauseMenu())
-                .setNegativeButton(R.string.exit, (dialog, id) -> activity.finishAndRemoveTask())
+                .setPositiveButton(R.string.button_play, (dialog, id) -> startGameAndClosePauseMenu())
+                .setNegativeButton(R.string.button_exit, (dialog, id) -> activity.finishAndRemoveTask())
                 .setOnDismissListener(this);
 
         TextView lastScoreLabel = view.findViewById(R.id.your_score_label);
         TextView lastScore = view.findViewById(R.id.your_score);
-        if (score != 0) {
-            lastScoreLabel.setVisibility(VISIBLE);
-            lastScore.setVisibility(VISIBLE);
-            lastScore.setText(String.valueOf(score));
-        } else {
-            lastScoreLabel.setVisibility(INVISIBLE);
-            lastScore.setVisibility(INVISIBLE);
-        }
+        TextView highScore = view.findViewById(R.id.highscore);
+
+        lastScore.setText(String.valueOf(sharedPref.getInt(saveLastscore, 0)));
+        highScore.setText(String.valueOf(sharedPref.getInt(saveHighscore, 0)));
 
         runOnUiThread(() -> {
             builder.create();
             builder.show();
         });
+    }
+
+    private void saveScores(int score) {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        int highscore = sharedPref.getInt(saveHighscore, 0);
+
+        editor.putInt(activity.getString(R.string.save_lastscore), score);
+        editor.commit();
+
+        if (score > highscore) {
+            editor.putInt(activity.getString(R.string.save_highscore), score);
+            editor.commit();
+        }
     }
 
     @Override
@@ -320,6 +335,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         snake.moveSnake();
 
         if (detectDeath()) {
+            saveScores(score);
             isPlaying = false;
             snake = null;
         }
@@ -361,18 +377,11 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
             if (isPlaying && !pauseMenuShown) {
                 drawGame(canvas, paint);
             } else {
-                drawStart();
+                showMenuDialog();
             }
 
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
-    }
-
-    private void drawStart() {
-
-        showPauseDialog();
-
-
     }
 
     private void drawGame(Canvas canvas, Paint paint) {

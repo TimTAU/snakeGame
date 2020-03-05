@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="current_score">Punktestand: %s</string>
-    <string name="play">Play</string>
-    <string name="highscore">Highscore:</string>
-    <string name="exit">Exit</string>
-    <string name="tilt">Gyros</string>
-    <string name="your_score">Your Score:</string>
-    <string name="control">Control</string>
-    <string name="theme">Theme</string>
-    <string name="buttons">Buttons</string>
-    <string name="swype">Swype</string>
-    <string name="grass">Grass</string>
-    <string name="water">Water</string>
+    <string name="button_play">Spielen</string>
+    <string name="button_exit">Beenden</string>
+
+    <string name="label_current_score">Punktestand: %s</string>
+    <string name="label_highscore">Highscore:</string>
+    <string name="label_your_score">Letzter Score:</string>
+    <string name="label_control">Steuerung</string>
+    <string name="label_theme">Theme</string>
+
+    <string name="game_controls_tilt">Gyros</string>
+    <string name="game_controls_buttons">Knöpfe</string>
+    <string name="game_controls_swype">Swype</string>
+    <string name="game_theme_grass">Gras</string>
+    <string name="game_theme_water">Wasser</string>
 </resources>
