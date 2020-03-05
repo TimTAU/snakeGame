@@ -25,11 +25,12 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.Random;
 import java.util.stream.IntStream;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import fhaachen.snakegame.R;
 import fhaachen.snakegame.model.Controls;
 import fhaachen.snakegame.model.Snake;
@@ -207,7 +208,6 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     @SuppressLint("InflateParams")
     // Pass null as the parent view because its going in the dialog layout
     public void showPauseDialog() {
-
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         pauseMenuShown = true;
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -220,25 +220,21 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
                 .setNegativeButton(R.string.exit, (dialog, id) -> activity.finishAndRemoveTask())
                 .setOnDismissListener(this);
 
-        TextView lastScoreLabel = (TextView) view.findViewById(R.id.your_score_label);
-        TextView lastScore = (TextView) view.findViewById(R.id.your_score);
+        TextView lastScoreLabel = view.findViewById(R.id.your_score_label);
+        TextView lastScore = view.findViewById(R.id.your_score);
         if (score != 0) {
             lastScoreLabel.setVisibility(VISIBLE);
             lastScore.setVisibility(VISIBLE);
-            lastScore.setText(Integer.toString(score));
+            lastScore.setText(String.valueOf(score));
         } else {
             lastScoreLabel.setVisibility(INVISIBLE);
             lastScore.setVisibility(INVISIBLE);
-
         }
 
         runOnUiThread(() -> {
             builder.create();
             builder.show();
-
         });
-
-
     }
 
     @Override
