@@ -23,6 +23,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -186,11 +187,39 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
                 .setNegativeButton(R.string.button_exit, (dialog, id) -> activity.finishAndRemoveTask())
                 .setOnDismissListener(this);
 
+        //Scores
         TextView lastScore = view.findViewById(R.id.your_score);
         TextView highScore = view.findViewById(R.id.highscore);
-
         lastScore.setText(String.valueOf(getSharedPreference(R.string.save_lastscore, 0)));
         highScore.setText(String.valueOf(getSharedPreference(R.string.save_highscore, 0)));
+
+        //Set theme radioButton
+        RadioButton themeRadioButton;
+        Theme theme = Theme.valueOf(getSharedPreference(R.string.setting_theme, Theme.GRASS.toString()));
+        //Maybe there will be more themes
+        //noinspection SwitchStatementWithTooFewBranches
+        switch (theme) {
+            case WATER:
+                themeRadioButton = view.findViewById(R.id.theme_water_button);
+                break;
+            default:
+                themeRadioButton = view.findViewById(R.id.theme_grass_button);
+        }
+        runOnUiThread(() -> themeRadioButton.setChecked(true));
+
+        RadioButton controlModeRadioButton;
+        Controls.Mode controlMode = Controls.Mode.valueOf(getSharedPreference(R.string.setting_control, Controls.Mode.GESTURES.toString()));
+        switch (controlMode) {
+            case BUTTONS:
+                controlModeRadioButton = view.findViewById(R.id.control_buttons_button);
+                break;
+            case TILT:
+                controlModeRadioButton = view.findViewById(R.id.control_tilt_button);
+                break;
+            default:
+                controlModeRadioButton = view.findViewById(R.id.control_swype_button);
+        }
+        runOnUiThread(() -> controlModeRadioButton.setChecked(true));
 
         runOnUiThread(() -> {
             builder.create();
