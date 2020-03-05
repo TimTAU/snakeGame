@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:textAppearance="@style/ScoreTheme"
         android:text="@string/label_highscore"
         app:layout_constraintStart_toStartOf="@+id/theme_label"
         app:layout_constraintTop_toTopOf="parent" />
@@ -18,6 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:textAppearance="@style/ScoreTheme"
         app:layout_constraintStart_toStartOf="@+id/control_label"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -27,6 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:text="@string/label_your_score"
+        android:textAppearance="@style/ScoreTheme"
         app:layout_constraintStart_toStartOf="@+id/theme_label"
         app:layout_constraintTop_toBottomOf="@+id/highscore_label" />
 
@@ -35,6 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
+        android:textAppearance="@style/ScoreTheme"
         app:layout_constraintStart_toStartOf="@+id/highscore"
         app:layout_constraintTop_toBottomOf="@+id/highscore" />
 
@@ -43,6 +48,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/label_control"
+        android:textAppearance="@style/ScoreTheme"
         app:layout_constraintEnd_toEndOf="@+id/control_group"
         app:layout_constraintStart_toStartOf="@+id/control_group"
         app:layout_constraintTop_toTopOf="@+id/theme_label" />
@@ -51,17 +57,19 @@
         android:id="@+id/theme_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:text="@string/label_theme"
+        android:textAppearance="@style/ScoreTheme"
         app:layout_constraintEnd_toEndOf="@+id/themes_group"
         app:layout_constraintStart_toStartOf="@+id/themes_group"
-        app:layout_constraintTop_toBottomOf="@id/your_score_label" />
+        app:layout_constraintTop_toBottomOf="@+id/divider" />
 
     <RadioGroup
         android:id="@+id/themes_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:textAppearance="@style/ScoreTheme"
         app:layout_constraintEnd_toStartOf="@+id/control_group"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/theme_label">
@@ -71,6 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="onThemeSelected"
+            android:textAppearance="@style/ScoreTheme"
             android:text="@string/game_theme_grass" />
 
         <RadioButton
@@ -78,6 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="onThemeSelected"
+            android:textAppearance="@style/ScoreTheme"
             android:text="@string/game_theme_water" />
 
     </RadioGroup>
@@ -86,6 +96,7 @@
         android:id="@+id/control_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAppearance="@style/ScoreTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/themes_group"
         app:layout_constraintTop_toTopOf="@+id/themes_group">
@@ -95,6 +106,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="onControlSelected"
+            android:textAppearance="@style/ScoreTheme"
             android:text="@string/game_controls_buttons" />
 
         <RadioButton
@@ -102,6 +114,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="onControlSelected"
+            android:textAppearance="@style/ScoreTheme"
             android:text="@string/game_controls_swype" />
 
         <RadioButton
@@ -109,7 +122,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="onControlSelected"
+            android:textAppearance="@style/ScoreTheme"
             android:text="@string/game_controls_tilt" />
     </RadioGroup>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="409dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#505050"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/your_score_label" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

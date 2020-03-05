@@ -31,6 +31,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.Random;
 import java.util.stream.IntStream;
 
+import androidx.appcompat.view.ContextThemeWrapper;
 import fhaachen.snakegame.R;
 import fhaachen.snakegame.model.Controls;
 import fhaachen.snakegame.model.Snake;
@@ -191,7 +192,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     public void showMenuDialog() {
         activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         pauseMenuShown = true;
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(getContext(), R.style.ScoreTheme));
 
         // Inflate and set the layout for the dialog
         View view = activity.getLayoutInflater().inflate(R.layout.pause_menu, null);
