@@ -54,8 +54,6 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     private final Controls.Mode controlMode = Controls.Mode.BUTTONS;
     private final AppCompatActivity activity;
 
-    private final int requestedOrientationOnStart;
-
     private Snake snake;
     private final Controls controls;
     private final Rect food;
@@ -118,9 +116,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
         //Activity
         activity = (AppCompatActivity) getContext();
 
-        //TODO: Further analysis WARUM DER KACK NICHT FUNKTIONIERT
-        requestedOrientationOnStart = activity.getRequestedOrientation();
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
 
         // Get the pixel dimensions of the screen
         display = activity.getWindowManager().getDefaultDisplay();
@@ -159,9 +155,6 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
 
     @Override
     public void run() {
-        AppCompatActivity activity = (AppCompatActivity) getContext();
-        int orientationOnStart = activity.getRequestedOrientation();
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         while (isRunning) {
             if (updateRequired()) {
                 if (isPlaying) {
@@ -170,7 +163,6 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
                 draw();
             }
         }
-        activity.setRequestedOrientation(orientationOnStart);
     }
 
     /**
@@ -197,7 +189,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     @SuppressLint("InflateParams")
     // Pass null as the parent view because its going in the dialog layout
     public void showPauseDialog() {
-        activity.setRequestedOrientation(requestedOrientationOnStart);
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
         pauseMenuShown = true;
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
@@ -222,7 +214,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
     }
 
     private void startGameAndClosePauseMenu() {
-        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+        activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
         startGame();
         pauseMenuShown = false;
         isRunning = true;
