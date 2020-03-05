@@ -7,4 +7,10 @@
     <string name="exit">Exit</string>
     <string name="gyros">Gyros</string>
     <string name="your_score">Your Score:</string>
+    <string name="control">Control</string>
+    <string name="theme">Theme</string>
+    <string name="buttons">Buttons</string>
+    <string name="swype">Swype</string>
+    <string name="grass">Grass</string>
+    <string name="water">Water</string>
 </resources>
