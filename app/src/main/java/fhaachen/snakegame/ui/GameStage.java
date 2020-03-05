@@ -322,7 +322,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
      * @return true if death is detected
      */
     private boolean detectDeath() {
-        /*// Hit the screen edge
+        // Hit the screen edge
         if (snake.getHeadX() == -1 || snake.getHeadX() >= numBlocksWide + 1 || snake.getHeadY() == -1 || snake.getHeadY() == numBlocksHigh + 1) {
             return true;
         }
@@ -334,7 +334,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
                     && (snake.getHeadY() == snake.getBodyY(i))) {
                 return true;
             }
-        }*/
+        }
 
         // Hit nothing
         return false;
@@ -549,7 +549,7 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
      *
      * @param velocityX range swiped on x axis
      * @param velocityY range swiped on y axis
-     * @return true because
+     * @return true when event is consumed
      */
     public boolean onFling(float velocityX, float velocityY) {
         if (controlMode == Controls.Mode.GESTURES) {
@@ -566,6 +566,8 @@ public class GameStage extends SurfaceView implements Runnable, DialogInterface.
                     snake.setDirectionUp();
                 }
             }
+        } else {
+            return false;
         }
         return true;
     }
