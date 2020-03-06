@@ -15,5 +15,5 @@
     <string name="game_theme_grass">Gras</string>
     <string name="game_theme_water">Wasser</string>
 
-    <string name="share_highscore">Ich habe in Snake einen Highscore von %d erreicht. was schaffst du?</string>
+    <string name="share_highscore">Ich habe in Snake einen Highscore von %d erreicht. Was schaffst du?</string>
 </resources>
