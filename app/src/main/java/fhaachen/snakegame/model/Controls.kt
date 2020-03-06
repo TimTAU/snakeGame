@@ -4,8 +4,6 @@ import android.graphics.Rect
 import fhaachen.snakegame.enums.ControlButton
 
 class Controls(posX: Int, posY: Int, buttonSize: Int) {
-
-
     val buttons: Array<Rect?> = arrayOfNulls(4)
 
     fun getButton(button: ControlButton): Rect? {
