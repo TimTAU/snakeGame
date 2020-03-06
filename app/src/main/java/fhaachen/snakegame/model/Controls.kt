@@ -12,14 +12,14 @@ class Controls(posX: Int, posY: Int, buttonSize: Int) {
     }
 
     val buttons: Array<Rect?> = arrayOfNulls(4)
-    fun getButton(button: Button?): Rect? {
-        when (button) {
-            Button.LEFT -> return buttons[0]
-            Button.UP -> return buttons[1]
-            Button.RIGHT -> return buttons[2]
-            Button.DOWN -> return buttons[3]
+
+    fun getButton(button: Button): Rect? {
+        return when (button) {
+            Button.LEFT -> buttons[0]
+            Button.UP -> buttons[1]
+            Button.RIGHT -> buttons[2]
+            Button.DOWN -> buttons[3]
         }
-        throw RuntimeException("Button couldn't be evaluated")
     }
 
     init {
