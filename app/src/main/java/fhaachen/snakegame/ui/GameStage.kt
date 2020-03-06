@@ -19,12 +19,12 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat.startActivity
 import fhaachen.snakegame.R
 import fhaachen.snakegame.helper.ControlsHelper
-import fhaachen.snakegame.helper.GameHelper.detectDeath
 import fhaachen.snakegame.helper.ScoreHelper.getHighScore
 import fhaachen.snakegame.helper.ScoreHelper.getLastScore
 import fhaachen.snakegame.helper.ScoreHelper.saveScore
 import fhaachen.snakegame.helper.SharedPreferencesHelper.getSharedPreference
 import fhaachen.snakegame.helper.SharedPreferencesHelper.setSharedPreference
+import fhaachen.snakegame.helper.SnakeHelper.detectDeath
 import fhaachen.snakegame.model.Controls
 import fhaachen.snakegame.model.Snake
 import fhaachen.snakegame.model.Theme
@@ -125,7 +125,7 @@ constructor(context: Context?) : SurfaceView(context), Runnable, DialogInterface
         val lastScore = view.findViewById<TextView>(R.id.your_score)
         val highScore = view.findViewById<TextView>(R.id.highscore)
 
-        highScore.setOnClickListener{
+        highScore.setOnClickListener {
             composeMessage(applicationContext.getString(R.string.share_highscore, getSharedPreference(context, R.string.share_highscore, 0)))
         }
 
@@ -153,14 +153,15 @@ constructor(context: Context?) : SurfaceView(context), Runnable, DialogInterface
         })
     }
 
+    /**
+     * Share message
+     */
     private fun composeMessage(message: String) {
         val intent = Intent(Intent.ACTION_SEND).apply {
             putExtra(Intent.EXTRA_TEXT, message)
-            setType("text/plain")
-
+            type = "text/plain"
         }
-        startActivity(context, Intent.createChooser(intent, "Share"), null);
-
+        startActivity(context, Intent.createChooser(intent, "Share"), null)
     }
 
     override fun onDismiss(dialog: DialogInterface) {
