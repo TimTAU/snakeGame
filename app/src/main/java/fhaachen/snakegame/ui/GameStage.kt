@@ -3,6 +3,7 @@ package fhaachen.snakegame.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.*
 import android.hardware.Sensor
@@ -15,6 +16,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.content.ContextCompat.startActivity
 import fhaachen.snakegame.R
 import fhaachen.snakegame.helper.ControlsHelper
 import fhaachen.snakegame.helper.GameHelper.detectDeath
@@ -122,6 +124,11 @@ constructor(context: Context?) : SurfaceView(context), Runnable, DialogInterface
         //Scores
         val lastScore = view.findViewById<TextView>(R.id.your_score)
         val highScore = view.findViewById<TextView>(R.id.highscore)
+
+        highScore.setOnClickListener{
+            composeMessage(applicationContext.getString(R.string.share_highscore, getSharedPreference(context, R.string.share_highscore, 0)))
+        }
+
         lastScore.text = getLastScore(context)
         highScore.text = getHighScore(context)
         //Set theme radioButton
@@ -144,6 +151,16 @@ constructor(context: Context?) : SurfaceView(context), Runnable, DialogInterface
             builder.create()
             builder.show()
         })
+    }
+
+    private fun composeMessage(message: String) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_TEXT, message)
+            setType("text/plain")
+
+        }
+        startActivity(context, Intent.createChooser(intent, "Share"), null);
+
     }
 
     override fun onDismiss(dialog: DialogInterface) {
