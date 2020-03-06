@@ -1,4 +1,4 @@
-package fhaachen.snakegame.model
+package fhaachen.snakegame.enums
 
 enum class Theme {
     GRASS, WATER

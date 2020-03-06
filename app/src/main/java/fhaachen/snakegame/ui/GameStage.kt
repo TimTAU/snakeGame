@@ -18,6 +18,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat.startActivity
 import fhaachen.snakegame.R
+import fhaachen.snakegame.enums.ControlMode
+import fhaachen.snakegame.enums.Theme
 import fhaachen.snakegame.helper.ControlsHelper
 import fhaachen.snakegame.helper.ScoreHelper.getHighScore
 import fhaachen.snakegame.helper.ScoreHelper.getLastScore
@@ -27,7 +29,6 @@ import fhaachen.snakegame.helper.SharedPreferencesHelper.setSharedPreference
 import fhaachen.snakegame.helper.SnakeHelper.detectDeath
 import fhaachen.snakegame.model.Controls
 import fhaachen.snakegame.model.Snake
-import fhaachen.snakegame.model.Theme
 import java.util.*
 import java.util.stream.IntStream
 
@@ -64,7 +65,7 @@ constructor(context: Context?) : SurfaceView(context), Runnable, DialogInterface
     //Game elements
     private var snake: Snake? = null
     private var controls: Controls? = null
-    private lateinit var controlMode: Controls.Mode
+    private lateinit var controlMode: ControlMode
     private var food: Rect = Rect()
     private var score = 0
 
@@ -140,10 +141,10 @@ constructor(context: Context?) : SurfaceView(context), Runnable, DialogInterface
         }
         runOnUiThread(Runnable { themeRadioButton.isChecked = true })
         val controlModeRadioButton: RadioButton
-        val controlMode = Controls.Mode.valueOf(getSharedPreference(context, R.string.setting_control, Controls.Mode.GESTURES.toString()))
+        val controlMode = ControlMode.valueOf(getSharedPreference(context, R.string.setting_control, ControlMode.GESTURES.toString()))
         controlModeRadioButton = when (controlMode) {
-            Controls.Mode.BUTTONS -> view.findViewById(R.id.control_buttons_button)
-            Controls.Mode.TILT -> view.findViewById(R.id.control_tilt_button)
+            ControlMode.BUTTONS -> view.findViewById(R.id.control_buttons_button)
+            ControlMode.TILT -> view.findViewById(R.id.control_tilt_button)
             else -> view.findViewById(R.id.control_swype_button)
         }
         runOnUiThread(Runnable { controlModeRadioButton.isChecked = true })
@@ -161,7 +162,7 @@ constructor(context: Context?) : SurfaceView(context), Runnable, DialogInterface
             putExtra(Intent.EXTRA_TEXT, message)
             type = "text/plain"
         }
-        startActivity( context, Intent.createChooser(intent, "Share"), null)
+        startActivity(context, Intent.createChooser(intent, "Share"), null)
     }
 
     override fun onDismiss(dialog: DialogInterface) {
@@ -306,7 +307,7 @@ constructor(context: Context?) : SurfaceView(context), Runnable, DialogInterface
         // Set controls color
         paint.color = applicationContext.getColor(R.color.controllers)
         // Draw controls if needed
-        if (controlMode === Controls.Mode.BUTTONS && controls != null) {
+        if (controlMode === ControlMode.BUTTONS && controls != null) {
             for (control in controls!!.buttons) {
                 canvas.drawRect(
                         control!!.left.toFloat(),
@@ -392,8 +393,8 @@ constructor(context: Context?) : SurfaceView(context), Runnable, DialogInterface
         val applicationContext = context.applicationContext
         val contextResources = applicationContext.resources
         val defaultControlMode = contextResources.getString(R.string.setting_control_default)
-        controlMode = Controls.Mode.valueOf(getSharedPreference(context, R.string.setting_control, defaultControlMode))
-        controls = if (controlMode === Controls.Mode.BUTTONS) {
+        controlMode = ControlMode.valueOf(getSharedPreference(context, R.string.setting_control, defaultControlMode))
+        controls = if (controlMode === ControlMode.BUTTONS) {
             val controlButtonSize = snakeBlockSize * 3
             val controlsY = screenY - controlButtonSize * 3 - snakeBlockSize
             Controls(snakeBlockSize, controlsY, controlButtonSize)
@@ -443,22 +444,22 @@ constructor(context: Context?) : SurfaceView(context), Runnable, DialogInterface
     }
 
     /**
-     * Assigns its [Controls.Mode] to the pressed radio button and updates the controls if required
+     * Assigns its [Controls.ControlMode] to the pressed radio button and updates the controls if required
      *
      * @param v pressed View
      */
     fun onControlSelected(v: View) {
         when (v.id) {
-            R.id.control_buttons_button -> updateControlModeIfRequired(Controls.Mode.BUTTONS.toString())
-            R.id.control_swype_button -> updateControlModeIfRequired(Controls.Mode.GESTURES.toString())
-            R.id.control_tilt_button -> updateControlModeIfRequired(Controls.Mode.TILT.toString())
+            R.id.control_buttons_button -> updateControlModeIfRequired(ControlMode.BUTTONS.toString())
+            R.id.control_swype_button -> updateControlModeIfRequired(ControlMode.GESTURES.toString())
+            R.id.control_tilt_button -> updateControlModeIfRequired(ControlMode.TILT.toString())
         }
     }
 
     /**
      * Checks if the setting is different from the previous one and triggers an update accordingly
      *
-     * @param value of the [Controls.Mode] to be used
+     * @param value of the [Controls.ControlMode] to be used
      */
     private fun updateControlModeIfRequired(value: String) {
         val defaultControl = context.applicationContext.resources.getString(R.string.setting_control_default)

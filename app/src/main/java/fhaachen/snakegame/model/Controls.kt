@@ -1,24 +1,19 @@
 package fhaachen.snakegame.model
 
 import android.graphics.Rect
+import fhaachen.snakegame.enums.ControlButton
 
 class Controls(posX: Int, posY: Int, buttonSize: Int) {
-    enum class Mode {
-        BUTTONS, TILT, GESTURES
-    }
 
-    enum class Button {
-        UP, RIGHT, DOWN, LEFT
-    }
 
     val buttons: Array<Rect?> = arrayOfNulls(4)
 
-    fun getButton(button: Button): Rect? {
+    fun getButton(button: ControlButton): Rect? {
         return when (button) {
-            Button.LEFT -> buttons[0]
-            Button.UP -> buttons[1]
-            Button.RIGHT -> buttons[2]
-            Button.DOWN -> buttons[3]
+            ControlButton.LEFT -> buttons[0]
+            ControlButton.UP -> buttons[1]
+            ControlButton.RIGHT -> buttons[2]
+            ControlButton.DOWN -> buttons[3]
         }
     }
 

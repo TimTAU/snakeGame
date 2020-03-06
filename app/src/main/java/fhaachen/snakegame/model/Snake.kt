@@ -1,10 +1,8 @@
 package fhaachen.snakegame.model
 
-class Snake(initX: Int, initY: Int, maxLength: Int) {
-    private enum class Direction {
-        UP, RIGHT, DOWN, LEFT
-    }
+import fhaachen.snakegame.enums.SnakeDirection
 
+class Snake(initX: Int, initY: Int, maxLength: Int) {
     /**
      * Returns all x coordinates where a part of the snake is present
      *
@@ -30,7 +28,7 @@ class Snake(initX: Int, initY: Int, maxLength: Int) {
     /**
      * Direction the snake is moving to
      */
-    private var currentDirection: Direction
+    private var currentDirection: SnakeDirection
 
     /**
      * Increases the snake length by one
@@ -50,10 +48,10 @@ class Snake(initX: Int, initY: Int, maxLength: Int) {
             // Exclude the head because the head has nothing in front of it
         }
         when (getCurrentDirection()) {
-            Direction.UP -> bodyYs[0]--
-            Direction.RIGHT -> bodyXs[0]++
-            Direction.DOWN -> bodyYs[0]++
-            Direction.LEFT -> bodyXs[0]--
+            SnakeDirection.UP -> bodyYs[0]--
+            SnakeDirection.RIGHT -> bodyXs[0]++
+            SnakeDirection.DOWN -> bodyYs[0]++
+            SnakeDirection.LEFT -> bodyXs[0]--
         }
     }
 
@@ -87,19 +85,19 @@ class Snake(initX: Int, initY: Int, maxLength: Int) {
      *
      * @param direction new direction
      */
-    private fun setCurrentDirection(direction: Direction) {
+    private fun setCurrentDirection(direction: SnakeDirection) {
         // shouldn't change direction if new direction is opposite from previous
         when (direction) {
-            Direction.UP -> if (getCurrentDirection() != Direction.DOWN) {
+            SnakeDirection.UP -> if (getCurrentDirection() != SnakeDirection.DOWN) {
                 currentDirection = direction
             }
-            Direction.RIGHT -> if (getCurrentDirection() != Direction.LEFT) {
+            SnakeDirection.RIGHT -> if (getCurrentDirection() != SnakeDirection.LEFT) {
                 currentDirection = direction
             }
-            Direction.DOWN -> if (getCurrentDirection() != Direction.UP) {
+            SnakeDirection.DOWN -> if (getCurrentDirection() != SnakeDirection.UP) {
                 currentDirection = direction
             }
-            Direction.LEFT -> if (getCurrentDirection() != Direction.RIGHT) {
+            SnakeDirection.LEFT -> if (getCurrentDirection() != SnakeDirection.RIGHT) {
                 currentDirection = direction
             }
         }
@@ -109,28 +107,28 @@ class Snake(initX: Int, initY: Int, maxLength: Int) {
      * Sets the snake direction to left
      */
     fun setDirectionLeft() {
-        setCurrentDirection(Direction.LEFT)
+        setCurrentDirection(SnakeDirection.LEFT)
     }
 
     /**
      * Sets the snake direction to up
      */
     fun setDirectionUp() {
-        setCurrentDirection(Direction.UP)
+        setCurrentDirection(SnakeDirection.UP)
     }
 
     /**
      * Sets the snake direction to right
      */
     fun setDirectionRight() {
-        setCurrentDirection(Direction.RIGHT)
+        setCurrentDirection(SnakeDirection.RIGHT)
     }
 
     /**
      * Sets the snake direction to down
      */
     fun setDirectionDown() {
-        setCurrentDirection(Direction.DOWN)
+        setCurrentDirection(SnakeDirection.DOWN)
     }
 
     /**
@@ -138,7 +136,7 @@ class Snake(initX: Int, initY: Int, maxLength: Int) {
      *
      * @return current direction
      */
-    private fun getCurrentDirection(): Direction {
+    private fun getCurrentDirection(): SnakeDirection {
         return currentDirection
     }
 
@@ -151,7 +149,7 @@ class Snake(initX: Int, initY: Int, maxLength: Int) {
     init {
         bodyXs[0] = initX
         bodyYs[0] = initY
-        currentDirection = Direction.RIGHT
+        currentDirection = SnakeDirection.RIGHT
         snakeLength = 0
     }
 }

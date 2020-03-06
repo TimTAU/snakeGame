@@ -4,6 +4,8 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.view.MotionEvent
 import android.view.Surface
+import fhaachen.snakegame.enums.ControlButton
+import fhaachen.snakegame.enums.ControlMode
 import fhaachen.snakegame.model.Controls
 import fhaachen.snakegame.model.Snake
 import kotlin.math.abs
@@ -16,22 +18,22 @@ object ControlsHelper {
      * @param motionEvent event from touch
      * @return true if game needs to be started or a different control mode is selected
      */
-    fun onTouchEvent(motionEvent: MotionEvent, controlMode: Controls.Mode, isPlaying: Boolean, controls: Controls?, snake: Snake): Boolean {
+    fun onTouchEvent(motionEvent: MotionEvent, controlMode: ControlMode, isPlaying: Boolean, controls: Controls?, snake: Snake): Boolean {
         if (motionEvent.action == MotionEvent.ACTION_DOWN) {
-            if (controlMode === Controls.Mode.BUTTONS && isPlaying) {
+            if (controlMode === ControlMode.BUTTONS && isPlaying) {
                 val posX = motionEvent.x.roundToInt()
                 val posY = motionEvent.y.roundToInt()
                 when {
-                    controls!!.getButton(Controls.Button.LEFT)!!.contains(posX, posY) -> {
+                    controls!!.getButton(ControlButton.LEFT)!!.contains(posX, posY) -> {
                         snake.setDirectionLeft()
                     }
-                    controls.getButton(Controls.Button.UP)!!.contains(posX, posY) -> {
+                    controls.getButton(ControlButton.UP)!!.contains(posX, posY) -> {
                         snake.setDirectionUp()
                     }
-                    controls.getButton(Controls.Button.RIGHT)!!.contains(posX, posY) -> {
+                    controls.getButton(ControlButton.RIGHT)!!.contains(posX, posY) -> {
                         snake.setDirectionRight()
                     }
-                    controls.getButton(Controls.Button.DOWN)!!.contains(posX, posY) -> {
+                    controls.getButton(ControlButton.DOWN)!!.contains(posX, posY) -> {
                         snake.setDirectionDown()
                     }
                 }
@@ -48,9 +50,9 @@ object ControlsHelper {
      * @param event         event from the sensor
      * @param accelerometer Sensor that fired the event
      */
-    fun onSensorChanged(event: SensorEvent, accelerometer: Sensor, controlMode: Controls.Mode, screenRotation: Int, snake: Snake) {
+    fun onSensorChanged(event: SensorEvent, accelerometer: Sensor, controlMode: ControlMode, screenRotation: Int, snake: Snake) {
         if (event.sensor == accelerometer) {
-            if (controlMode === Controls.Mode.TILT) {
+            if (controlMode === ControlMode.TILT) {
                 val x = event.values[0].roundToInt()
                 val y = event.values[1].roundToInt()
                 val xStrongerThanY = abs(x) > abs(y)
@@ -140,8 +142,8 @@ object ControlsHelper {
      * @param velocityY range swiped on y axis
      * @return true when event is consumed
      */
-    fun onFling(velocityX: Float, velocityY: Float, controlMode: Controls.Mode, isPlaying: Boolean, snake: Snake): Boolean {
-        if (controlMode === Controls.Mode.GESTURES && isPlaying) {
+    fun onFling(velocityX: Float, velocityY: Float, controlMode: ControlMode, isPlaying: Boolean, snake: Snake): Boolean {
+        if (controlMode === ControlMode.GESTURES && isPlaying) {
             if (abs(velocityX) > abs(velocityY)) {
                 if (velocityX > 0) {
                     snake.setDirectionRight()
