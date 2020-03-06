@@ -126,7 +126,7 @@ constructor(context: Context?) : SurfaceView(context), Runnable, DialogInterface
         val highScore = view.findViewById<TextView>(R.id.highscore)
 
         highScore.setOnClickListener {
-            composeMessage(applicationContext.getString(R.string.share_highscore, getSharedPreference(context, R.string.share_highscore, 0)))
+            composeMessage(applicationContext.getString(R.string.share_highscore, getSharedPreference(context, R.string.save_highscore, 0)))
         }
 
         lastScore.text = getLastScore(context)
@@ -161,7 +161,7 @@ constructor(context: Context?) : SurfaceView(context), Runnable, DialogInterface
             putExtra(Intent.EXTRA_TEXT, message)
             type = "text/plain"
         }
-        startActivity(context, Intent.createChooser(intent, "Share"), null)
+        startActivity( context, Intent.createChooser(intent, "Share"), null)
     }
 
     override fun onDismiss(dialog: DialogInterface) {
