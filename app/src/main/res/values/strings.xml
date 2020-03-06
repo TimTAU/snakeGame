@@ -23,4 +23,6 @@
 
     <string name="save_highscore" translatable="false">save_highscore</string>
     <string name="save_lastscore" translatable="false">save_lastscore</string>
+
+    <string name="share_highscore">I reached a score of %d in Snake. Will you beat me?</string>
 </resources>
